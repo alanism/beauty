@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Report: The Future of Aria's Beauty</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals - A palette of #F5F5F5 (Alabaster), #E0E0E0 (Gallery), #A1887F (Muesli), and #3E2723 (English Walnut) for a calm, harmonious, and supportive feel. -->
+    <!-- Application Structure Plan: A top-down narrative structure is chosen. It starts with an introduction, moves to the parental baselines for context, then presents the core prediction for Aria through an interactive chart and scenario selector. This flow guides the user logically from the foundational data to the final conclusion, making a complex analysis easy to follow. Key interactions include switching between scenarios to dynamically update Aria's projected score chart and detailed breakdown, facilitating direct comparison and understanding of the predictive model. -->
+    <!-- Visualization & Content Choices: 
+        - Parental Scores: Goal: Compare. Method: Two side-by-side radar charts (Chart.js) to show the multi-faceted nature of their scores. Interaction: Hovering for tooltips. Justification: Radar charts are excellent for comparing multiple quantitative variables, making the strengths of each parent immediately visible.
+        - Aria's Prediction: Goal: Inform & Compare Scenarios. Method: A central bar chart (Chart.js) showing Aria's score vs. her parents, which updates based on a scenario selector. Interaction: Clicking scenario buttons updates the chart and a detailed text block. Justification: This directly links user interaction to a visual change, making the differences between scenarios clear and engaging.
+        - Rubric Details: Goal: Inform. Method: A simple, elegant HTML table. Justification: A table is the clearest way to present structured, weighted data like the rubric criteria.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5F5;
+            color: #3E2723;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #A1887F;
+            color: #F5F5F5;
+            font-weight: 600;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+        
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#3E2723] mb-2">Aria's Future Beauty: An Interactive Analysis</h1>
+            <p class="text-lg text-[#A1887F]">Exploring genetic inheritance and aesthetic potential through data.</p>
+        </header>
+
+        <main>
+            <section id="introduction" class="mb-16 bg-white/50 p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-bold mb-4 text-[#3E2723]">Introduction</h2>
+                <p class="text-base leading-relaxed">This interactive application translates a comprehensive report on facial aesthetics into an explorable experience. It analyzes the genetic potential passed down from parents, Alan and Ash, to their daughter, Aria. By interacting with the charts and scenarios below, you can explore the data-backed predictions for Aria's adult appearance and understand the methodology used to arrive at these conclusions.</p>
+            </section>
+
+            <section id="parental-baselines" class="mb-16">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#3E2723]">Parental Baselines: The Genetic Foundation</h2>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="bg-white/50 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-semibold text-center mb-4">Alan's Score: ~7.50</h3>
+                        <div class="chart-container mx-auto">
+                            <canvas id="alanChart"></canvas>
+                        </div>
+                        <p class="text-sm mt-4 text-center text-[#A1887F]">Characterized by a strong jawline, taut skin, and overall symmetry. His AI-feminized version scored an even higher 7.9, showing excellent potential for a daughter.</p>
+                    </div>
+                    <div class="bg-white/50 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-semibold text-center mb-4">Ash's Score: ~7.54</h3>
+                        <div class="chart-container mx-auto">
+                            <canvas id="ashChart"></canvas>
+                        </div>
+                        <p class="text-sm mt-4 text-center text-[#A1887F]">Defined by classically feminine traits: full brows, plush lips, and a gentle cheek contour, placing her in the top 10-15% globally.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="prediction" class="mb-16 text-center">
+                <h2 class="text-3xl font-bold mb-4 text-[#3E2723]">Aria's Predicted Future</h2>
+                <p class="max-w-3xl mx-auto mb-8 text-[#A1887F]">Based on her parents' strong genetic scores, we can model several potential outcomes for Aria. The "Optimized Harmony" scenario is predicted as most likely. Select a scenario below to see how Aria's projected score and features change.</p>
+                
+                <div class="flex justify-center flex-wrap gap-2 mb-8">
+                    <button class="nav-button px-4 py-2 rounded-md bg-[#E0E0E0]" data-scenario="harmony">Optimized Harmony (Most Likely)</button>
+                    <button class="nav-button px-4 py-2 rounded-md bg-[#E0E0E0]" data-scenario="synergy">Synergy-Plus</button>
+                    <button class="nav-button px-4 py-2 rounded-md bg-[#E0E0E0]" data-scenario="worst">Worst-Case Blend</button>
+                    <button class="nav-button px-4 py-2 rounded-md bg-[#E0E0E0]" data-scenario="dad">Dad-Dominant</button>
+                </div>
+
+                <div class="grid lg:grid-cols-5 gap-8">
+                    <div class="lg:col-span-3 bg-white/50 p-6 rounded-lg shadow-sm">
+                        <h3 id="comparisonChartTitle" class="text-xl font-semibold text-center mb-4">Comparison: Aria vs. Parents</h3>
+                         <div class="relative h-80 md:h-96">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                    </div>
+                    <div id="scenarioDetails" class="lg:col-span-2 bg-white/50 p-6 rounded-lg shadow-sm text-left fade-in">
+                        <h3 id="detailsTitle" class="text-xl font-bold mb-3"></h3>
+                        <p id="detailsDescription" class="mb-4 text-sm leading-relaxed"></p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm"><span>Symmetry:</span> <span id="detailSymmetry" class="font-semibold"></span></div>
+                            <div class="flex justify-between text-sm"><span>Skin Clarity:</span> <span id="detailSkin" class="font-semibold"></span></div>
+                            <div class="flex justify-between text-sm"><span>Eye Shape:</span> <span id="detailEyes" class="font-semibold"></span></div>
+                            <div class="flex justify-between text-sm"><span>Jawline:</span> <span id="detailJaw" class="font-semibold"></span></div>
+                             <div class="flex justify-between text-sm"><span>Ethnic Harmony:</span> <span id="detailHarmony" class="font-semibold"></span></div>
+                            <div class="flex justify-between text-lg font-bold border-t pt-2 mt-2 border-[#E0E0E0]"><span>Projected Score:</span> <span id="detailScore"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="methodology" class="mb-16 bg-white/50 p-6 rounded-lg shadow-sm">
+                <h2 class="text-2xl font-bold mb-4 text-[#3E2723]">Methodology: The 12-Criteria Rubric</h2>
+                <p class="text-base leading-relaxed mb-6">The scores are calculated using a weighted rubric that quantifies facial attractiveness based on 12 criteria. This method provides a structured and more objective basis for analysis. Below are the key criteria and their respective weights in the final score.</p>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-[#E0E0E0] text-[#3E2723] uppercase">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 rounded-l-lg">Criterion</th>
+                                <th scope="col" class="px-6 py-3">Weight</th>
+                                <th scope="col" class="px-6 py-3 rounded-r-lg">What it Measures</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-[#E0E0E0]"><td class="px-6 py-4 font-medium">Symmetry & Golden Ratios</td><td class="px-6 py-4">20%</td><td class="px-6 py-4">Facial balance, a key subconscious marker of genetic fitness.</td></tr>
+                            <tr class="border-b border-[#E0E0E0]"><td class="px-6 py-4 font-medium">Skin Clarity & Tone</td><td class="px-6 py-4">15%</td><td class="px-6 py-4">Signals health, youth, and vitality.</td></tr>
+                            <tr class="border-b border-[#E0E0E0]"><td class="px-6 py-4 font-medium">Eye Shape & Brows</td><td class="px-6 py-4">14%</td><td class="px-6 py-4">Critical for expression and first impressions.</td></tr>
+                            <tr class="border-b border-[#E0E0E0]"><td class="px-6 py-4 font-medium">Facial Adiposity / Contour</td><td class="px-6 py-4">10%</td><td class="px-6 py-4">The definition and leaness of facial features.</td></tr>
+                            <tr><td class="px-6 py-4 font-medium">Other (Jaw, Lips, etc.)</td><td class="px-6 py-4">41%</td><td class="px-6 py-4">Remaining features contributing to overall harmony.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="text-center mt-12 pt-8 border-t border-[#E0E0E0]">
+            <p class="text-sm text-[#A1887F]">This interactive application is based on the analysis provided in the "Comprehensive Report: Predicting Aria's Future Facial Aesthetics." All scores and descriptions are derived from that source material. For entertainment and informational purposes only.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chartStyles = {
+                pointBackgroundColor: '#A1887F',
+                borderColor: 'rgba(161, 136, 127, 0.5)',
+                backgroundColor: 'rgba(161, 136, 127, 0.2)',
+                angleLines: { color: 'rgba(62, 39, 35, 0.1)' },
+                grid: { color: 'rgba(62, 39, 35, 0.1)' },
+                ticks: {
+                    backdropColor: 'transparent',
+                    color: '#3E2723',
+                    font: { size: 10 }
+                },
+                pointLabels: { 
+                    color: '#3E2723',
+                    font: { size: 12 }
+                }
+            };
+            
+            const labels = ['Symmetry', 'Skin', 'Eyes/Brows', 'Jaw/Contour', 'Nose', 'Lips', 'Harmony'];
+            
+            const alanData = {
+                label: 'Alan',
+                data: [7.5, 9.0, 6.5, 8.0, 7.0, 7.0, 7.5],
+                ...chartStyles
+            };
+
+            const ashData = {
+                label: 'Ash',
+                data: [7.5, 7.5, 7.5, 8.0, 7.5, 8.0, 7.5],
+                ...chartStyles
+            };
+
+            const radarOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        min: 5,
+                        max: 10,
+                        ...chartStyles
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            };
+
+            new Chart(document.getElementById('alanChart'), {
+                type: 'radar',
+                data: { labels, datasets: [alanData] },
+                options: radarOptions
+            });
+
+            new Chart(document.getElementById('ashChart'), {
+                type: 'radar',
+                data: { labels, datasets: [ashData] },
+                options: radarOptions
+            });
+
+            const scenarios = {
+                harmony: { title: 'Optimized Skeletal Feminization & Soft Tissue Harmony', score: 8.18, description: "Aria's most likely outcome, representing a highly refined and fortuitous genetic combination. Alan's strong skeletal structure feminizes perfectly, enhanced by Ash's superior soft tissue features.", details: { symmetry: 8.3, skin: 8.2, eyes: 8.0, jaw: 8.3, harmony: 8.5 } },
+                synergy: { title: 'Synergy-Plus', score: 8.05, description: "Represents a blend of the absolute best traits from both parents, plus a small boost from 'hybrid vigor'. She gets Alan's jaw and Ash's eyes/lips.", details: { symmetry: 8.0, skin: 8.0, eyes: 7.6, jaw: 8.0, harmony: 8.5 } },
+                worst: { title: 'Worst-Case Blend', score: 7.35, description: "A less optimal combination of features. While still very attractive, the individual traits do not harmonize as perfectly as in other scenarios.", details: { symmetry: 7.5, skin: 7.5, eyes: 7.0, jaw: 7.5, harmony: 7.5 } },
+                dad: { title: 'Dad-Dominant', score: 7.70, description: "Aria inherits a majority of Alan's features, including his strong jaw and broader nasal tip, with less expression of Ash's softer traits.", details: { symmetry: 7.6, skin: 7.8, eyes: 7.2, jaw: 7.8, harmony: 7.5 } }
+            };
+
+            let comparisonChart;
+
+            function updateScenario(scenarioKey) {
+                const scenario = scenarios[scenarioKey];
+                
+                document.querySelectorAll('.nav-button').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.scenario === scenarioKey) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                const detailsContainer = document.getElementById('scenarioDetails');
+                detailsContainer.classList.remove('fade-in');
+                void detailsContainer.offsetWidth; 
+                detailsContainer.classList.add('fade-in');
+
+                document.getElementById('detailsTitle').textContent = scenario.title;
+                document.getElementById('detailsDescription').textContent = scenario.description;
+                document.getElementById('detailSymmetry').textContent = scenario.details.symmetry.toFixed(1);
+                document.getElementById('detailSkin').textContent = scenario.details.skin.toFixed(1);
+                document.getElementById('detailEyes').textContent = scenario.details.eyes.toFixed(1);
+                document.getElementById('detailJaw').textContent = scenario.details.jaw.toFixed(1);
+                document.getElementById('detailHarmony').textContent = scenario.details.harmony.toFixed(1);
+                document.getElementById('detailScore').textContent = scenario.score.toFixed(2);
+                document.getElementById('comparisonChartTitle').textContent = `Comparison: ${scenario.title}`;
+
+                updateComparisonChart(scenario.score);
+            }
+
+            function updateComparisonChart(ariaScore) {
+                const ctx = document.getElementById('comparisonChart').getContext('2d');
+                const data = {
+                    labels: ['Alan', 'Ash', 'Aria (Projected)'],
+                    datasets: [{
+                        label: 'Weighted Score',
+                        data: [7.50, 7.54, ariaScore],
+                        backgroundColor: [
+                            'rgba(62, 39, 35, 0.6)',
+                            'rgba(62, 39, 35, 0.7)',
+                            'rgba(161, 136, 127, 0.8)'
+                        ],
+                        borderColor: [
+                             '#3E2723',
+                             '#3E2723',
+                             '#A1887F'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                };
+
+                if (comparisonChart) {
+                    comparisonChart.data.datasets[0].data = [7.50, 7.54, ariaScore];
+                    comparisonChart.update();
+                } else {
+                    comparisonChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: data,
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: {
+                                    beginAtZero: false,
+                                    min: 7.0,
+                                    max: 8.5,
+                                    grid: {
+                                        color: 'rgba(62, 39, 35, 0.1)'
+                                    },
+                                    ticks: {
+                                        color: '#3E2723'
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: '#3E2723',
+                                        font: {
+                                            size: 14,
+                                            weight: '500'
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return `Score: ${context.raw.toFixed(2)}`;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+            
+            document.querySelectorAll('.nav-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    updateScenario(e.target.dataset.scenario);
+                });
+            });
+
+            updateScenario('harmony'); 
+        });
+    </script>
+</body>
+</html>
