@@ -1,0 +1,390 @@
+{
+  "rubric_type": "female_facial_beauty_v5",
+  "version": "2025-08-09",
+  "scale": {
+    "min": 1,
+    "max": 5,
+    "step": 0.5,
+    "anchors": {
+      "1": "Noticeably discordant or far from attractive range",
+      "3": "Typical / acceptable for age and ancestry",
+      "5": "Elite / striking; highly attractive expression of the trait"
+    }
+  },
+  "image_requirements": [
+    "3–10 images: front, 45°, profile; video (60–90s) optional",
+    "Neutral daylight or diffused white light; no filters",
+    "Camera ≥1.5m away; avoid wide-angle distortion",
+    "Neutral expression + natural smile in at least one image",
+    "Hair off facial boundaries; remove glasses if possible"
+  ],
+  "criteria": [
+    {
+      "id": 1,
+      "name": "Face Shape & Proportions",
+      "notes": {
+        "18-29": "Youthful symmetry, balanced proportions expected.",
+        "30-39": "Mature balance, slight asymmetry acceptable.",
+        "40-54": "Elegance in proportions, harmony over perfection."
+      }
+    },
+    {
+      "id": 2,
+      "name": "Midface Width/Height",
+      "notes": {
+        "18-29": "Compact midface, youthful ratio emphasized.",
+        "30-39": "Balanced ratio, slight elongation acceptable.",
+        "40-54": "Proportional harmony, less focus on compactness."
+      }
+    },
+    {
+      "id": 3,
+      "name": "Cervico-mental Angle",
+      "notes": {
+        "18-29": "Sharp angle, youthful definition.",
+        "30-39": "Defined but slight softening allowed.",
+        "40-54": "Graceful angle, natural softening expected."
+      }
+    },
+    {
+      "id": 4,
+      "name": "Jawline Definition (Feminine)",
+      "notes": {
+        "18-29": "Soft yet defined jawline, youthful contour.",
+        "30-39": "Defined with slight softening acceptable.",
+        "40-54": "Elegant contour, natural softening prioritized."
+      }
+    },
+    {
+      "id": 5,
+      "name": "Chin Shape & Projection",
+      "notes": {
+        "18-29": "Delicate, proportional projection.",
+        "30-39": "Balanced projection, slight rounding allowed.",
+        "40-54": "Harmonious shape, natural variation accepted."
+      }
+    },
+    {
+      "id": 6,
+      "name": "Gonial/Jaw Angle (Feminine)",
+      "notes": {
+        "18-29": "Soft, feminine angle, youthful sharpness.",
+        "30-39": "Balanced angle, slight broadening acceptable.",
+        "40-54": "Graceful angle, natural maturity emphasized."
+      }
+    },
+    {
+      "id": 7,
+      "name": "Zygomatic Projection & OG Curve",
+      "notes": {
+        "18-29": "Prominent cheekbones, youthful curve.",
+        "30-39": "Defined cheekbones, slight flattening allowed.",
+        "40-54": "Elegant projection, harmonious curve."
+      }
+    },
+    {
+      "id": 8,
+      "name": "Periocular Shape (Almond Tendency)",
+      "notes": {
+        "18-29": "Almond shape, youthful vibrancy.",
+        "30-39": "Almond tendency, slight hooding acceptable.",
+        "40-54": "Harmonious shape, natural aging graceful."
+      }
+    },
+    {
+      "id": 9,
+      "name": "Eye Spacing & Size Harmony",
+      "notes": {
+        "18-29": "Balanced spacing, large eyes emphasized.",
+        "30-39": "Proportional spacing, moderate size acceptable.",
+        "40-54": "Harmonious spacing, elegance over size."
+      }
+    },
+    {
+      "id": 10,
+      "name": "Canthal Tilt & Medial Canthus",
+      "notes": {
+        "18-29": "Positive tilt, youthful sharpness.",
+        "30-39": "Neutral to positive tilt, slight softening.",
+        "40-54": "Graceful tilt, natural variation accepted."
+      }
+    },
+    {
+      "id": 11,
+      "name": "Brow/Lash Frame",
+      "notes": {
+        "18-29": "Full brows, lush lashes, youthful frame.",
+        "30-39": "Defined brows, moderate lash fullness.",
+        "40-54": "Groomed brows, elegant lash frame."
+      }
+    },
+    {
+      "id": 12,
+      "name": "Nasal Harmony (Feminine)",
+      "notes": {
+        "18-29": "Delicate, proportional nose.",
+        "30-39": "Balanced nose, slight broadening allowed.",
+        "40-54": "Harmonious nose, natural variation accepted."
+      }
+    },
+    {
+      "id": 13,
+      "name": "Lip Shape/Proportion",
+      "notes": {
+        "18-29": "Full, defined lips, youthful plumpness.",
+        "30-39": "Proportional lips, slight thinning acceptable.",
+        "40-54": "Elegant shape, natural thinning graceful."
+      }
+    },
+    {
+      "id": 14,
+      "name": "Dental Display & Smile",
+      "notes": {
+        "18-29": "Bright, even smile, youthful alignment.",
+        "30-39": "Balanced smile, minor imperfections acceptable.",
+        "40-54": "Warm, harmonious smile, elegance emphasized."
+      }
+    },
+    {
+      "id": 15,
+      "name": "Skin Evenness/Texture",
+      "notes": {
+        "18-29": "Smooth, even skin, minimal blemishes.",
+        "30-39": "Even texture, early lines acceptable.",
+        "40-54": "Graceful texture, expression lines natural."
+      }
+    },
+    {
+      "id": 16,
+      "name": "Facial Fat Distribution",
+      "notes": {
+        "18-29": "Youthful fullness, balanced distribution.",
+        "30-39": "Balanced fat, slight loss acceptable.",
+        "40-54": "Harmonious distribution, natural loss elegant."
+      }
+    },
+    {
+      "id": 17,
+      "name": "Upper Third (Forehead)",
+      "notes": {
+        "18-29": "Smooth, proportional forehead.",
+        "30-39": "Balanced forehead, early lines acceptable.",
+        "40-54": "Elegant forehead, natural lines graceful."
+      }
+    },
+    {
+      "id": 18,
+      "name": "Overall Averageness/Harmony",
+      "notes": {
+        "18-29": "Youthful symmetry, balanced harmony.",
+        "30-39": "Mature harmony, slight asymmetry allowed.",
+        "40-54": "Elegant harmony, natural variation celebrated."
+      }
+    },
+    {
+      "id": 19,
+      "name": "Hair as Frame",
+      "notes": {
+        "18-29": "Lush, vibrant hair framing face.",
+        "30-39": "Healthy hair, moderate volume acceptable.",
+        "40-54": "Groomed, elegant hair framing face."
+      }
+    },
+    {
+      "id": 20,
+      "name": "Overall Presence",
+      "notes": {
+        "18-29": "Vibrant, youthful charisma.",
+        "30-39": "Confident, mature presence.",
+        "40-54": "Graceful, elegant aura."
+      }
+    }
+  ],
+  "groups": {
+    "shape_structure": { "criteria_ids": [1, 2, 3, 4, 5, 6, 7, 17, 18] },
+    "eyes_brows": { "criteria_ids": [8, 9, 10, 11] },
+    "nose_lips_smile": { "criteria_ids": [12, 13, 14] },
+    "skin_fat_hair_presence": { "criteria_ids": [15, 16, 19, 20] }
+  },
+  "base_weights": {
+    "shape_structure": 0.30,
+    "eyes_brows": 0.25,
+    "nose_lips_smile": 0.20,
+    "skin_fat_hair_presence": 0.25
+  },
+  "use_case_modifiers": {
+    "own_self": {
+      "notes": "Focus on health, maintenance, and realistic self-improvement for confidence.",
+      "multipliers": {
+        "shape_structure": 1.00,
+        "eyes_brows": 0.95,
+        "nose_lips_smile": 0.95,
+        "skin_fat_hair_presence": 1.15
+      }
+    },
+    "social_career": {
+      "notes": "Highlight polish, approachability, and professional appeal on camera or in-person.",
+      "multipliers": {
+        "shape_structure": 1.05,
+        "eyes_brows": 1.10,
+        "nose_lips_smile": 1.00,
+        "skin_fat_hair_presence": 0.95
+      }
+    },
+    "dating": {
+      "notes": "Emphasize first-glance impact, feminine cues, and romantic appeal.",
+      "multipliers": {
+        "shape_structure": 0.95,
+        "eyes_brows": 1.15,
+        "nose_lips_smile": 1.15,
+        "skin_fat_hair_presence": 0.95
+      }
+    }
+  },
+  "age_cohort_modifiers": {
+    "18-29": {
+      "notes": "Youthful vibrancy: prioritize eyes, skin, lips, and softness.",
+      "multipliers": {
+        "shape_structure": 0.95,
+        "eyes_brows": 1.10,
+        "nose_lips_smile": 1.05,
+        "skin_fat_hair_presence": 1.05
+      }
+    },
+    "30-39": {
+      "notes": "Mature balance: structure and polish with slight aging leniency.",
+      "multipliers": {
+        "shape_structure": 1.05,
+        "eyes_brows": 1.00,
+        "nose_lips_smile": 1.00,
+        "skin_fat_hair_presence": 0.95
+      }
+    },
+    "40-54": {
+      "notes": "Elegance and harmony: grooming and proportional balance prioritized.",
+      "multipliers": {
+        "shape_structure": 1.10,
+        "eyes_brows": 0.95,
+        "nose_lips_smile": 0.95,
+        "skin_fat_hair_presence": 1.00
+      }
+    }
+  },
+  "ethnic_modifiers": {
+    "european": {
+      "northern_europe": {
+        "notes": "Emphasize angular structure, fair skin tones.",
+        "multipliers": { "shape_structure": 1.10, "eyes_brows": 1.00, "nose_lips_smile": 0.90, "skin_fat_hair_presence": 1.00 }
+      },
+      "western_europe": {
+        "notes": "Balanced features, subtle contours.",
+        "multipliers": { "shape_structure": 1.05, "eyes_brows": 1.05, "nose_lips_smile": 0.95, "skin_fat_hair_presence": 0.95 }
+      },
+      "southern_europe": {
+        "notes": "Warm tones, expressive eyes and lips.",
+        "multipliers": { "shape_structure": 0.95, "eyes_brows": 1.05, "nose_lips_smile": 1.05, "skin_fat_hair_presence": 0.95 }
+      },
+      "eastern_europe": {
+        "notes": "Harmonious proportions, balanced features.",
+        "multipliers": { "shape_structure": 1.00, "eyes_brows": 1.00, "nose_lips_smile": 1.00, "skin_fat_hair_presence": 1.00 }
+      }
+    },
+    "asian": {
+      "east_asia": {
+        "notes": "Smooth skin, delicate features, almond eyes.",
+        "multipliers": { "shape_structure": 1.00, "eyes_brows": 1.10, "nose_lips_smile": 0.95, "skin_fat_hair_presence": 0.95 }
+      },
+      "southeast_asia": {
+        "notes": "Soft contours, vibrant skin tones.",
+        "multipliers": { "shape_structure": 0.95, "eyes_brows": 1.05, "nose_lips_smile": 1.00, "skin_fat_hair_presence": 1.10 }
+      },
+      "south_asia": {
+        "notes": "Expressive eyes, balanced proportions.",
+        "multipliers": { "shape_structure": 1.00, "eyes_brows": 1.05, "nose_lips_smile": 1.05, "skin_fat_hair_presence": 0.90 }
+      },
+      "west_asia": {
+        "notes": "Defined brows, striking eyes.",
+        "multipliers": { "shape_structure": 1.00, "eyes_brows": 1.10, "nose_lips_smile": 1.00, "skin_fat_hair_presence": 0.90 }
+      }
+    },
+    "african": {
+      "north_africa": {
+        "notes": "Refined features, smooth skin.",
+        "multipliers": { "shape_structure": 1.00, "eyes_brows": 1.05, "nose_lips_smile": 1.05, "skin_fat_hair_presence": 0.90 }
+      },
+      "west_africa": {
+        "notes": "Full lips, balanced proportions.",
+        "multipliers": { "shape_structure": 0.95, "eyes_brows": 1.00, "nose_lips_smile": 1.05, "skin_fat_hair_presence": 1.00 }
+      },
+      "east_africa": {
+        "notes": "Sculpted features, smooth texture.",
+        "multipliers": { "shape_structure": 1.00, "eyes_brows": 1.00, "nose_lips_smile": 0.95, "skin_fat_hair_presence": 1.05 }
+      },
+      "southern_africa": {
+        "notes": "Harmonious features, natural glow.",
+        "multipliers": { "shape_structure": 1.00, "eyes_brows": 1.00, "nose_lips_smile": 1.00, "skin_fat_hair_presence": 1.00 }
+      }
+    },
+    "latin_american": {
+      "central_america": {
+        "notes": "Vibrant lips, warm tones.",
+        "multipliers": { "shape_structure": 0.95, "eyes_brows": 1.00, "nose_lips_smile": 1.10, "skin_fat_hair_presence": 0.95 }
+      },
+      "caribbean": {
+        "notes": "Expressive features, radiant skin.",
+        "multipliers": { "shape_structure": 0.95, "eyes_brows": 1.05, "nose_lips_smile": 1.10, "skin_fat_hair_presence": 0.95 }
+      },
+      "andean": {
+        "notes": "Balanced proportions, soft contours.",
+        "multipliers": { "shape_structure": 1.00, "eyes_brows": 1.00, "nose_lips_smile": 1.05, "skin_fat_hair_presence": 0.95 }
+      },
+      "southern_cone": {
+        "notes": "Refined structure, elegant features.",
+        "multipliers": { "shape_structure": 1.05, "eyes_brows": 1.00, "nose_lips_smile": 0.95, "skin_fat_hair_presence": 1.00 }
+      }
+    }
+  },
+  "scoring_procedure": [
+    "Score each of the 20 criteria on a 1–5 scale, allowing half-point increments (e.g., 3.5, 4.5) for borderline cases.",
+    "Compute group means for shape_structure, eyes_brows, nose_lips_smile, skin_fat_hair_presence.",
+    "Apply base_weights to group means for Universal Score.",
+    "Select use_case, age_cohort, and ethnic_modifier. Multiply base_weights by respective multipliers, then renormalize to sum 1.00.",
+    "Calculate Adjusted Score = Σ(group_mean × adjusted_weight).",
+    "Generate Universal Score, Adjusted Score (use_case-specific), and Ethnic-Adjusted Score.",
+    "Provide per-criterion notes with actionable feedback."
+  ],
+  "visualization_guidelines": {
+    "chart": "Bar chart showing scores for each of the 20 criteria, grouped by category.",
+    "radial_graph": "Radar chart displaying group means (shape_structure, eyes_brows, nose_lips_smile, skin_fat_hair_presence).",
+    "bell_curve": "Plot Universal and Adjusted Scores on a bell curve, normalized to population averages for age and ethnic group."
+  },
+  "report_guidelines": {
+    "length": "Approximately 440 words",
+    "tone": "Friendly, empathetic, conversational, with a positive framing and actionable insights.",
+    "style": {
+      "personality": "ENFJ-like, warm, articulate, emotionally intelligent, with dry observational humor.",
+      "verbs": ["break down", "peel back", "dig into", "analyze", "address", "evaluate", "frame"],
+      "adjectives": ["strategic", "genuine", "radiant", "harmonious", "elegant", "vibrant"],
+      "colloquialisms": ["Here’s the thing", "I’m gonna say", "At the heart of it", "That’s the kicker"],
+      "transitional_phrases": [
+        "Let’s break this down…",
+        "Here’s why that matters…",
+        "So at the end of the day…",
+        "This is where things get interesting…"
+      ],
+      "questions": [
+        "What does this tell us about your unique beauty?",
+        "How can we enhance what’s already working?",
+        "Did you see how your presence shines here?"
+      ]
+    },
+    "structure": [
+      "Open with a positive, empathetic hook (e.g., 'You’re already bringing a lot to the table, so let’s break down what makes you shine!').",
+      "Summarize Universal Score and key strengths.",
+      "Detail Adjusted Scores for own_self, social_career, and dating, with context-specific insights.",
+      "Highlight Ethnic-Adjusted Score, emphasizing cultural beauty standards.",
+      "Provide per-criterion feedback with actionable, positive suggestions (e.g., 'Your skin texture is radiant; a light moisturizer can keep that glow popping!').",
+      "Close with an uplifting takeaway and call to action (e.g., 'What do you think? Let’s keep celebrating your unique vibe!')."
+    ]
+  }
+}

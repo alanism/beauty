@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>GPT‑5 — Facial Beauty Scorer (Netlify)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Inter:wght@600;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#fcfcfb; --ink:#000; --muted:#222; --card:#fff; --chip:#fffef7; --grid-dot:#ececec;
+      --outline:#000; --outline-dim:#9b9b9b; --cyan-600:#4EABBC; --orange-700:#A14634; --yellow-300:#FFFFD5; --green-500:#50A046; --violet-600:#6d28d9;}
+    :root[data-theme="dark"]{ --bg:#0b1e27; --ink:rgba(255,255,255,.95); --muted:rgba(255,255,255,.8); --card:rgba(15,35,45,.92);
+      --chip:rgba(173,252,247,.08); --grid-dot:rgba(255,255,255,.12); --outline:rgba(255,255,255,.70); --outline-dim:rgba(255,255,255,.40);
+      --gridline:rgba(255,255,255,.28); --label:rgba(255,255,255,.96); --btn-bg:#ADFCF7; --btn-fg:#001018; --btn-br:#ADFCF7;}
+    body { font-family:"DM Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background: radial-gradient(var(--grid-dot) 1px, transparent 1px) 0 0/12px 12px, var(--bg); color: var(--ink); transition: background .25s ease, color .25s ease; }
+    .container { max-width:1180px; margin-inline:auto; padding: 0 clamp(20px, 5vw, 56px); }
+    h1,h2,h3 { font-family:"Permanent Marker", cursive; letter-spacing:.5px; color: var(--ink); }
+    .kpi { font-family:"Inter", ui-sans-serif; font-variant-numeric:tabular-nums; }
+    .card{ background:var(--card); border:1px dotted var(--outline); border-radius:9px; box-shadow:0 2px 0 rgba(0,0,0,.06); padding:14px; }
+    .btn{ background:var(--btn-bg); color:var(--btn-fg); border:1px dotted var(--btn-br); border-radius:9px; font-weight:800; padding:10px 14px; }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; }
+    .file-input-wrap { position:relative; display:inline-flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .file-input-hidden { position:absolute; left:-9999px; width:0.1px; height:0.1px; opacity:0; overflow:hidden; z-index:-1; }
+    .file-input-label { display:inline-block; padding:10px 14px; background:var(--btn-bg); color:var(--btn-fg); border:1px dotted var(--btn-br); border-radius:9px; cursor:pointer; font-weight:800; }
+    .loading-overlay { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:1000; color:#fff; flex-direction:column; gap:1rem; }
+    .spinner { border:4px solid rgba(255,255,255,.35); border-top:4px solid #fff; border-radius:50%; width:42px; height:42px; animation:spin 1s linear infinite; }
+    @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+    .error-message,.info-message { padding:12px; border-radius:9px; margin-top:12px; border:1px dotted var(--outline); }
+    .error-message { background:rgba(233,0,0,.06); color:#b91c1c; }
+    .info-message { background:var(--chip); color:var(--ink); }
+    canvas { max-width:100%; height:auto; }
+    .tab { padding:8px 14px; border:1px dotted var(--outline); border-radius:9px; background:var(--chip); font-weight:800; color: var(--ink); }
+    .tab.active { background:var(--btn-bg); color:var(--btn-fg); border-color:var(--btn-br); }
+    .badge { display:inline-block; padding:6px 10px; background:var(--chip); border:1px dotted var(--outline); border-radius:9px; font-weight:800; color: var(--ink); }
+    .label { color: var(--muted); font-size:.95rem; }
+    .input,.select { background:var(--chip); border:1px dotted var(--outline-dim); border-radius:9px; padding:10px 12px; width:100%; color:var(--ink); }
+    .radio { accent-color:var(--cyan-600); }
+    .legend-dot{display:inline-block;width:10px;height:10px;border-radius:9999px;margin-right:6px;border:1px solid var(--outline);}
+    .file-pill{display:inline-flex;align-items:center;gap:.5rem;padding:.35rem .6rem;border:1px dotted var(--outline-dim);border-radius:9999px;background:var(--chip);color:var(--ink);font-size:.85rem;}
+    a.header-link{ text-decoration:none; font-weight:800; border:1px dotted var(--outline); border-radius:9px; padding:8px 12px; background:var(--chip); color:var(--ink); }
+    a.header-link:hover{ background:var(--btn-bg); color:var(--btn-fg); border-color:var(--btn-br); }
+    #explainer{ line-height:1.55; }
+    #explainer p{ margin:0 0 .9rem; }
+  </style>
+</head>
+<body class="py-8">
+  <!-- Embedded rubrics so file:// works -->
+  <script id="rubric_male_v5" type="application/json">{"rubric_type":"male_facial_beauty_v5","version":"2025-08-09","scale":{"min":1,"max":5,"step":0.5,"anchors":{"1":"Noticeably discordant or far from attractive range","3":"Typical / acceptable for age and ancestry","5":"Elite / striking; highly attractive expression of the trait"}},"image_requirements":["3–10 images: front, 45°, profile; video (60–90s) optional","Neutral daylight or diffused white light; no filters","Camera ≥1.5m away; avoid wide-angle distortion","Neutral expression + natural smile in at least one image","Hair not covering face; no glasses if possible"],"criteria":[{"id":1,"name":"Symmetry (Male)","notes":{"18-29":"High symmetry, youthful balance expected.","30-39":"Balanced symmetry, slight asymmetry acceptable.","40-54":"Distinguished symmetry, natural variation celebrated."}},{"id":2,"name":"Averageness (Male)","notes":{"18-29":"Youthful harmony, typical features emphasized.","30-39":"Mature harmony, slight deviations acceptable.","40-54":"Distinguished balance, natural variation prioritized."}},{"id":3,"name":"Facial Thirds & Index (Male)","notes":{"18-29":"Proportional thirds, youthful index.","30-39":"Balanced thirds, slight elongation allowed.","40-54":"Harmonious thirds, natural proportions elegant."}},{"id":4,"name":"fWHR & Brow–Orbital Masculinity","notes":{"18-29":"High fWHR, strong brow-orbital definition.","30-39":"Defined fWHR, moderate softening acceptable.","40-54":"Distinguished fWHR, natural softening prioritized."}},{"id":5,"name":"Jawline Definition (Male)","notes":{"18-29":"Sharp, chiseled jawline, youthful definition.","30-39":"Defined jawline, slight softening acceptable.","40-54":"Strong yet distinguished jawline, natural variation allowed."}},{"id":6,"name":"Ramus Height & Gonial Angle","notes":{"18-29":"Tall ramus, defined gonial angle.","30-39":"Balanced ramus, slight angle softening acceptable.","40-54":"Distinguished ramus and angle, natural maturity emphasized."}},{"id":7,"name":"Chin Projection & Shape (Male)","notes":{"18-29":"Strong, projected chin, youthful shape.","30-39":"Defined chin, moderate rounding allowed.","40-54":"Harmonious chin, natural shape celebrated."}},{"id":8,"name":"Jaw Width Ratio (Male)","notes":{"18-29":"Wide, masculine jaw ratio.","30-39":"Balanced jaw ratio, slight narrowing acceptable.","40-54":"Distinguished jaw ratio, natural variation elegant."}},{"id":9,"name":"Zygomatic Prominence (Male)","notes":{"18-29":"Prominent cheekbones, youthful definition.","30-39":"Defined cheekbones, slight flattening acceptable.","40-54":"Distinguished cheekbones, natural contour prioritized."}},{"id":10,"name":"Nose Proportion & Shape (Male)","notes":{"18-29":"Proportional, masculine nose shape.","30-39":"Balanced nose, slight broadening allowed.","40-54":"Harmonious nose, natural variation accepted."}},{"id":11,"name":"Eyes (Shape/Spacing/Tilt) (Male)","notes":{"18-29":"Defined shape, youthful spacing and tilt.","30-39":"Balanced eyes, slight hooding acceptable.","40-54":"Distinguished eye shape, natural aging graceful."}},{"id":12,"name":"Eyebrows (Male)","notes":{"18-29":"Full, defined brows, youthful frame.","30-39":"Groomed brows, moderate thinning acceptable.","40-54":"Distinguished brows, natural grooming emphasized."}},{"id":13,"name":"Periorbital Support (Male)","notes":{"18-29":"Strong periorbital support, youthful clarity.","30-39":"Balanced support, slight softening acceptable.","40-54":"Distinguished support, natural aging graceful."}},{"id":14,"name":"Lips (Form/Ratio) (Male)","notes":{"18-29":"Defined lips, masculine proportion.","30-39":"Balanced lips, slight thinning acceptable.","40-54":"Harmonious lips, natural shape prioritized."}},{"id":15,"name":"Teeth & Smile (Male)","notes":{"18-29":"Bright, aligned smile, youthful vitality.","30-39":"Balanced smile, minor imperfections acceptable.","40-54":"Warm, distinguished smile, elegance emphasized."}},{"id":16,"name":"Hairline & Density / Shaved Aesthetic","notes":{"18-29":"Full hairline, dense or sharp shaved look, no grey penalty.","30-39":"Balanced hairline, moderate thinning or grey hair acceptable.","40-54":"Distinguished hairline, grey hair or thinning natural and elegant."}},{"id":17,"name":"Skin Texture (Male)","notes":{"18-29":"Smooth, clear skin, minimal blemishes.","30-39":"Even texture, early lines or wrinkles acceptable.","40-54":"Distinguished texture, expression lines and wrinkles natural."}},{"id":18,"name":"Skin Tone Evenness (Male)","notes":{"18-29":"Even, vibrant skin tone.","30-39":"Balanced tone, slight unevenness acceptable.","40-54":"Harmonious tone, natural variation celebrated."}},{"id":19,"name":"Facial Leanness (Male)","notes":{"18-29":"Lean, defined face, youthful sharpness.","30-39":"Balanced leanness, moderate facial weight acceptable.","40-54":"Distinguished leanness, natural facial weight elegant."}},{"id":20,"name":"Cervico-mental Angle (Male)","notes":{"18-29":"Sharp, defined angle, youthful contour.","30-39":"Defined angle, slight softening acceptable.","40-54":"Distinguished angle, natural softening prioritized."}}],"groups":{"structure_block":{"criteria_ids":[1,2,3,4,5,6,7,8,9,10]},"eyes_skin_block":{"criteria_ids":[11,12,13,17,18,19,20]},"smile_hair_media_block":{"criteria_ids":[14,15,16]}},"base_weights":{"structure_block":0.5,"eyes_skin_block":0.3,"smile_hair_media_block":0.2},"use_case_modifiers":{"own_self":{"notes":"Focus on health, maintenance, and realistic self-improvement for confidence.","multipliers":{"structure_block":1.0,"eyes_skin_block":1.1,"smile_hair_media_block":0.95}},"social_career":{"notes":"Highlight authority, polish, and approachability for professional settings.","multipliers":{"structure_block":1.1,"eyes_skin_block":1.0,"smile_hair_media_block":1.0}},"dating":{"notes":"Emphasize masculine structure, eye clarity, and smile impact for romantic appeal.","multipliers":{"structure_block":1.1,"eyes_skin_block":1.05,"smile_hair_media_block":1.05}}},"age_cohort_modifiers":{"18-29":{"notes":"Youthful vibrancy: prioritize skin clarity, eyes, and defined structure.","multipliers":{"structure_block":0.95,"eyes_skin_block":1.1,"smile_hair_media_block":1.0}},"30-39":{"notes":"Mature balance: structure and grooming with leniency for early lines and facial weight.","multipliers":{"structure_block":1.05,"eyes_skin_block":1.0,"smile_hair_media_block":0.95}},"40-54":{"notes":"Distinguished elegance: grooming and structure with leniency for wrinkles, grey hair, and facial weight.","multipliers":{"structure_block":1.05,"eyes_skin_block":1.0,"smile_hair_media_block":1.0}}},"ethnic_modifiers":{"european":{"northern_europe":{"notes":"Emphasize strong jawline, angular structure.","multipliers":{"structure_block":1.1,"eyes_skin_block":0.95,"smile_hair_media_block":0.95}},"western_europe":{"notes":"Balanced features, defined contours.","multipliers":{"structure_block":1.05,"eyes_skin_block":1.0,"smile_hair_media_block":0.95}},"southern_europe":{"notes":"Warm tones, expressive eyes and smile.","multipliers":{"structure_block":1.0,"eyes_skin_block":1.0,"smile_hair_media_block":1.0}},"eastern_europe":{"notes":"Strong structure, harmonious features.","multipliers":{"structure_block":1.05,"eyes_skin_block":0.95,"smile_hair_media_block":1.0}}},"asian":{"east_asia":{"notes":"Smooth skin, balanced proportions.","multipliers":{"structure_block":0.95,"eyes_skin_block":1.1,"smile_hair_media_block":0.95}},"southeast_asia":{"notes":"Soft contours, vibrant skin tones.","multipliers":{"structure_block":0.95,"eyes_skin_block":1.05,"smile_hair_media_block":1.0}},"south_asia":{"notes":"Defined features, expressive eyes.","multipliers":{"structure_block":1.05,"eyes_skin_block":1.0,"smile_hair_media_block":0.95}},"west_asia":{"notes":"Strong brows, striking eyes.","multipliers":{"structure_block":1.05,"eyes_skin_block":1.0,"smile_hair_media_block":0.95}}},"african":{"north_africa":{"notes":"Refined structure, smooth skin.","multipliers":{"structure_block":1.05,"eyes_skin_block":1.0,"smile_hair_media_block":0.95}},"west_africa":{"notes":"Strong features, full lips.","multipliers":{"structure_block":1.05,"eyes_skin_block":1.0,"smile_hair_media_block":0.95}},"east_africa":{"notes":"Sculpted features, even skin tone.","multipliers":{"structure_block":1.0,"eyes_skin_block":1.05,"smile_hair_media_block":0.95}},"southern_africa":{"notes":"Balanced proportions, natural glow.","multipliers":{"structure_block":1.05,"eyes_skin_block":0.95,"smile_hair_media_block":1.0}}},"latin_american":{"central_america":{"notes":"Vibrant smile, warm tones.","multipliers":{"structure_block":1.0,"eyes_skin_block":1.0,"smile_hair_media_block":1.05}},"caribbean":{"notes":"Expressive features, radiant skin.","multipliers":{"structure_block":1.0,"eyes_skin_block":1.05,"smile_hair_media_block":1.05}},"andean":{"notes":"Strong structure, balanced features.","multipliers":{"structure_block":1.05,"eyes_skin_block":0.95,"smile_hair_media_block":1.0}},"southern_cone":{"notes":"Refined structure, elegant proportions.","multipliers":{"structure_block":1.05,"eyes_skin_block":0.95,"smile_hair_media_block":1.0}}}},"scoring_procedure":["Score each of the 20 criteria on a 1–5 scale, allowing half-point increments (e.g., 3.5, 4.5) for borderline cases.","Compute group means for structure_block, eyes_skin_block, smile_hair_media_block.","Apply base_weights to group means for Universal Score.","Select use_case, age_cohort, and ethnic_modifier. Multiply base_weights by respective multipliers, then renormalize to sum 1.00.","Calculate Adjusted Score = Σ(group_mean × adjusted_weight).","Generate Universal Score, Adjusted Score (use_case-specific), and Ethnic-Adjusted Score.","Provide per-criterion notes with actionable feedback."],"visualization_guidelines":{"chart":"Bar chart showing scores for each of the 20 criteria, grouped by category.","radial_graph":"Radar chart displaying group means (structure_block, eyes_skin_block, smile_hair_media_block).","bell_curve":"Plot Universal and Adjusted Scores on a bell curve, normalized to population averages for age and ethnic group."},"report_guidelines":{"length":"Approximately 440 words","tone":"Friendly, empathetic, conversational, with a positive framing and actionable insights.","style":{"personality":"ENFJ-like, warm, articulate, emotionally intelligent, with dry observational humor.","verbs":["break down","peel back","dig into","analyze","address","evaluate","frame"],"adjectives":["strong","distinguished","radiant","harmonious","confident","vibrant"],"colloquialisms":["Here’s the thing","I’m gonna say","At the heart of it","That’s the kicker"],"transitional_phrases":["Let’s break this down…","Here’s why that matters…","So at the end of the day…","This is where things get interesting…"],"questions":["What makes your unique look stand out?","How can we amplify what’s already strong?","Did you see how your presence commands attention?"]},"structure":["Open with a positive, empathetic hook (e.g., 'You’ve got a strong presence—let’s dig into what makes it shine!').","Summarize Universal Score and key strengths.","Detail Adjusted Scores for own_self, social_career, and dating, with context-specific insights.","Highlight Ethnic-Adjusted Score, emphasizing cultural beauty standards.","Provide per-criterion feedback with actionable, positive suggestions (e.g., 'Your jawline is strong; a light grooming routine can keep it sharp!').","Close with an uplifting takeaway and call to action (e.g., 'What do you think? Let’s keep showcasing your unique vibe!')."]}}</script>
+  <script id="rubric_female_v5" type="application/json">{"rubric_type":"female_facial_beauty_v5","version":"2025-08-09","scale":{"min":1,"max":5,"step":0.5,"anchors":{"1":"Noticeably discordant or far from attractive range","3":"Typical / acceptable for age and ancestry","5":"Elite / striking; highly attractive expression of the trait"}},"image_requirements":["3–10 images: front, 45°, profile; video (60–90s) optional","Neutral daylight or diffused white light; no filters","Camera ≥1.5m away; avoid wide-angle distortion","Neutral expression + natural smile in at least one image","Hair off facial boundaries; remove glasses if possible"],"criteria":[{"id":1,"name":"Face Shape & Proportions","notes":{"18-29":"Youthful symmetry, balanced proportions expected.","30-39":"Mature balance, slight asymmetry acceptable.","40-54":"Elegance in proportions, harmony over perfection."}},{"id":2,"name":"Midface Width/Height","notes":{"18-29":"Compact midface, youthful ratio emphasized.","30-39":"Balanced ratio, slight elongation acceptable.","40-54":"Proportional harmony, less focus on compactness."}},{"id":3,"name":"Cervico-mental Angle","notes":{"18-29":"Sharp angle, youthful definition.","30-39":"Defined but slight softening allowed.","40-54":"Graceful angle, natural softening expected."}},{"id":4,"name":"Jawline Definition (Feminine)","notes":{"18-29":"Soft yet defined jawline, youthful contour.","30-39":"Defined with slight softening acceptable.","40-54":"Elegant contour, natural softening prioritized."}},{"id":5,"name":"Chin Shape & Projection","notes":{"18-29":"Delicate, proportional projection.","30-39":"Balanced projection, slight rounding allowed.","40-54":"Harmonious shape, natural variation accepted."}},{"id":6,"name":"Gonial/Jaw Angle (Feminine)","notes":{"18-29":"Soft, feminine angle, youthful sharpness.","30-39":"Balanced angle, slight broadening acceptable.","40-54":"Graceful angle, natural maturity emphasized."}},{"id":7,"name":"Zygomatic Projection & OG Curve","notes":{"18-29":"Prominent cheekbones, youthful curve.","30-39":"Defined cheekbones, slight flattening allowed.","40-54":"Elegant projection, harmonious curve."}},{"id":8,"name":"Periocular Shape (Almond Tendency)","notes":{"18-29":"Almond shape, youthful vibrancy.","30-39":"Almond tendency, slight hooding acceptable.","40-54":"Harmonious shape, natural aging graceful."}},{"id":9,"name":"Eye Spacing & Size Harmony","notes":{"18-29":"Balanced spacing, large eyes emphasized.","30-39":"Proportional spacing, moderate size acceptable.","40-54":"Harmonious spacing, elegance over size."}},{"id":10,"name":"Canthal Tilt & Medial Canthus","notes":{"18-29":"Positive tilt, youthful sharpness.","30-39":"Neutral to positive tilt, slight softening.","40-54":"Graceful tilt, natural variation accepted."}},{"id":11,"name":"Brow/Lash Frame","notes":{"18-29":"Full brows, lush lashes, youthful frame.","30-39":"Defined brows, moderate lash fullness.","40-54":"Groomed brows, elegant lash frame."}},{"id":12,"name":"Nasal Harmony (Feminine)","notes":{"18-29":"Delicate, proportional nose.","30-39":"Balanced nose, slight broadening allowed.","40-54":"Harmonious nose, natural variation accepted."}},{"id":13,"name":"Lip Shape/Proportion","notes":{"18-29":"Full, defined lips, youthful plumpness.","30-39":"Proportional lips, slight thinning acceptable.","40-54":"Elegant shape, natural thinning graceful."}},{"id":14,"name":"Dental Display & Smile","notes":{"18-29":"Bright, even smile, youthful alignment.","30-39":"Balanced smile, minor imperfections acceptable.","40-54":"Warm, harmonious smile, elegance emphasized."}},{"id":15,"name":"Skin Evenness/Texture","notes":{"18-29":"Smooth, even skin, minimal blemishes.","30-39":"Even texture, early lines acceptable.","40-54":"Graceful texture, expression lines natural."}},{"id":16,"name":"Facial Fat Distribution","notes":{"18-29":"Youthful fullness, balanced distribution.","30-39":"Balanced fat, slight loss acceptable.","40-54":"Harmonious distribution, natural loss elegant."}},{"id":17,"name":"Upper Third (Forehead)","notes":{"18-29":"Smooth, proportional forehead.","30-39":"Balanced forehead, early lines acceptable.","40-54":"Elegant forehead, natural lines graceful."}},{"id":18,"name":"Overall Averageness/Harmony","notes":{"18-29":"Youthful symmetry, balanced harmony.","30-39":"Mature harmony, slight asymmetry allowed.","40-54":"Elegant harmony, natural variation celebrated."}},{"id":19,"name":"Hair as Frame","notes":{"18-29":"Lush, vibrant hair framing face.","30-39":"Healthy hair, moderate volume acceptable.","40-54":"Groomed, elegant hair framing face."}},{"id":20,"name":"Overall Presence","notes":{"18-29":"Vibrant, youthful charisma.","30-39":"Confident, mature presence.","40-54":"Graceful, elegant aura."}}],"groups":{"shape_structure":{"criteria_ids":[1,2,3,4,5,6,7,17,18]},"eyes_brows":{"criteria_ids":[8,9,10,11]},"nose_lips_smile":{"criteria_ids":[12,13,14]},"skin_fat_hair_presence":{"criteria_ids":[15,16,19,20]}},"base_weights":{"shape_structure":0.3,"eyes_brows":0.25,"nose_lips_smile":0.2,"skin_fat_hair_presence":0.25},"use_case_modifiers":{"own_self":{"notes":"Focus on health, maintenance, and realistic self-improvement for confidence.","multipliers":{"shape_structure":1.0,"eyes_brows":0.95,"nose_lips_smile":0.95,"skin_fat_hair_presence":1.15}},"social_career":{"notes":"Highlight polish, approachability, and professional appeal on camera or in-person.","multipliers":{"shape_structure":1.05,"eyes_brows":1.1,"nose_lips_smile":1.0,"skin_fat_hair_presence":0.95}},"dating":{"notes":"Emphasize first-glance impact, feminine cues, and romantic appeal.","multipliers":{"shape_structure":0.95,"eyes_brows":1.15,"nose_lips_smile":1.15,"skin_fat_hair_presence":0.95}}},"age_cohort_modifiers":{"18-29":{"notes":"Youthful vibrancy: prioritize eyes, skin, lips, and softness.","multipliers":{"shape_structure":0.95,"eyes_brows":1.1,"nose_lips_smile":1.05,"skin_fat_hair_presence":1.05}},"30-39":{"notes":"Mature balance: structure and polish with slight aging leniency.","multipliers":{"shape_structure":1.05,"eyes_brows":1.0,"nose_lips_smile":1.0,"skin_fat_hair_presence":0.95}},"40-54":{"notes":"Elegance and harmony: grooming and proportional balance prioritized.","multipliers":{"shape_structure":1.1,"eyes_brows":0.95,"nose_lips_smile":0.95,"skin_fat_hair_presence":1.0}}},"ethnic_modifiers":{"european":{"northern_europe":{"notes":"Emphasize angular structure, fair skin tones.","multipliers":{"shape_structure":1.1,"eyes_brows":1.0,"nose_lips_smile":0.9,"skin_fat_hair_presence":1.0}},"western_europe":{"notes":"Balanced features, subtle contours.","multipliers":{"shape_structure":1.05,"eyes_brows":1.05,"nose_lips_smile":0.95,"skin_fat_hair_presence":0.95}},"southern_europe":{"notes":"Warm tones, expressive eyes and lips.","multipliers":{"shape_structure":0.95,"eyes_brows":1.05,"nose_lips_smile":1.05,"skin_fat_hair_presence":0.95}},"eastern_europe":{"notes":"Harmonious proportions, balanced features.","multipliers":{"shape_structure":1.0,"eyes_brows":1.0,"nose_lips_smile":1.0,"skin_fat_hair_presence":1.0}}},"asian":{"east_asia":{"notes":"Smooth skin, delicate features, almond eyes.","multipliers":{"shape_structure":1.0,"eyes_brows":1.1,"nose_lips_smile":0.95,"skin_fat_hair_presence":0.95}},"southeast_asia":{"notes":"Soft contours, vibrant skin tones.","multipliers":{"shape_structure":0.95,"eyes_brows":1.05,"nose_lips_smile":1.0,"skin_fat_hair_presence":1.1}},"south_asia":{"notes":"Expressive eyes, balanced proportions.","multipliers":{"shape_structure":1.0,"eyes_brows":1.05,"nose_lips_smile":1.05,"skin_fat_hair_presence":0.9}},"west_asia":{"notes":"Defined brows, striking eyes.","multipliers":{"shape_structure":1.0,"eyes_brows":1.1,"nose_lips_smile":1.0,"skin_fat_hair_presence":0.9}}},"african":{"north_africa":{"notes":"Refined features, smooth skin.","multipliers":{"shape_structure":1.0,"eyes_brows":1.05,"nose_lips_smile":1.05,"skin_fat_hair_presence":0.9}},"west_africa":{"notes":"Full lips, balanced proportions.","multipliers":{"shape_structure":0.95,"eyes_brows":1.0,"nose_lips_smile":1.05,"skin_fat_hair_presence":1.0}},"east_africa":{"notes":"Sculpted features, even skin tone.","multipliers":{"shape_structure":1.0,"eyes_brows":1.0,"nose_lips_smile":0.95,"skin_fat_hair_presence":1.05}},"southern_africa":{"notes":"Harmonious features, natural glow.","multipliers":{"shape_structure":1.0,"eyes_brows":1.0,"nose_lips_smile":1.0,"skin_fat_hair_presence":1.0}}},"latin_american":{"central_america":{"notes":"Vibrant lips, warm tones.","multipliers":{"shape_structure":0.95,"eyes_brows":1.0,"nose_lips_smile":1.1,"skin_fat_hair_presence":0.95}},"caribbean":{"notes":"Expressive features, radiant skin.","multipliers":{"shape_structure":0.95,"eyes_brows":1.05,"nose_lips_smile":1.1,"skin_fat_hair_presence":0.95}},"andean":{"notes":"Balanced proportions, soft contours.","multipliers":{"shape_structure":1.0,"eyes_brows":1.0,"nose_lips_smile":1.05,"skin_fat_hair_presence":0.95}},"southern_cone":{"notes":"Refined structure, elegant features.","multipliers":{"shape_structure":1.05,"eyes_brows":1.0,"nose_lips_smile":0.95,"skin_fat_hair_presence":1.0}}}},"scoring_procedure":["Score each of the 20 criteria on a 1–5 scale, allowing half-point increments (e.g., 3.5, 4.5) for borderline cases.","Compute group means for shape_structure, eyes_brows, nose_lips_smile, skin_fat_hair_presence.","Apply base_weights to group means for Universal Score.","Select use_case, age_cohort, and ethnic_modifier. Multiply base_weights by respective multipliers, then renormalize to sum 1.00.","Calculate Adjusted Score = Σ(group_mean × adjusted_weight).","Generate Universal Score, Adjusted Score (use_case-specific), and Ethnic-Adjusted Score.","Provide per-criterion notes with actionable feedback."],"visualization_guidelines":{"chart":"Bar chart showing scores for each of the 20 criteria, grouped by category.","radial_graph":"Radar chart displaying group means (shape_structure, eyes_brows, nose_lips_smile, skin_fat_hair_presence).","bell_curve":"Plot Universal and Adjusted Scores on a bell curve, normalized to population averages for age and ethnic group."},"report_guidelines":{"length":"Approximately 440 words","tone":"Friendly, empathetic, conversational, with a positive framing and actionable insights.","style":{"personality":"ENFJ-like, warm, articulate, emotionally intelligent, with dry observational humor.","verbs":["break down","peel back","dig into","analyze","address","evaluate","frame"],"adjectives":["strategic","genuine","radiant","harmonious","elegant","vibrant"],"colloquialisms":["Here’s the thing","I’m gonna say","At the heart of it","That’s the kicker"],"transitional_phrases":["Let’s break this down…","Here’s why that matters…","So at the end of the day…","This is where things get interesting…"],"questions":["What does this tell us about your unique beauty?","How can we enhance what’s already working?","Did you see how your presence shines here?"]},"structure":["Open with a positive, empathetic hook (e.g., 'You’re already bringing a lot to the table, so let’s break down what makes you shine!').","Summarize Universal Score and key strengths.","Detail Adjusted Scores for own_self, social_career, and dating, with context-specific insights.","Highlight Ethnic-Adjusted Score, emphasizing cultural beauty standards.","Provide per-criterion feedback with actionable, positive suggestions (e.g., 'Your skin texture is radiant; a light moisturizer can keep that glow popping!').","Close with an uplifting takeaway and call to action (e.g., 'What do you think? Let’s keep celebrating your unique vibe!')."]}}</script>
+
+  <div class="container">
+    <header class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <h1 class="text-3xl sm:text-4xl">Facial Beauty Scorer</h1>
+        <span class="badge">GPT‑5</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="./Gemini.html" class="header-link" title="Switch to Gemini version">Gemini 2.5 Flash</a>
+        <div class="flex items-center gap-2" role="tablist" aria-label="Theme">
+          <button id="lightBtn" class="tab active" role="tab" aria-selected="true">Light</button>
+          <button id="darkBtn" class="tab" role="tab" aria-selected="false">Dark</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="card mb-6">
+      <h2 class="text-2xl mb-2">Powered by OpenAI GPT‑5 (via Netlify Function)</h2>
+      <p class="mb-2">We don’t “guess” your beauty. We score it with a <strong>20‑criteria checklist</strong> used by elite scouts.</p>
+      <p class="mb-2">Two encouraging notes + one hard truth in each section — clear, specific, and actionable.</p>
+      <p class="mb-2"><strong>Send 3–10 images</strong> (front, 45°, profiles). No filters. Hair off face. Distance ≥1.5m.</p>
+      <p class="label"><strong>Privacy:</strong> API calls are routed through a Netlify Function where the OpenAI key is stored securely as an environment variable. No OpenAI key is stored in your browser.</p>
+      <p class="label"><strong>Important:</strong> Ensure your OpenAI API key is set as an environment variable named `OPENAI_API_KEY` in your Netlify project settings.</p>
+    </section>
+
+    <section class="grid md:grid-cols-3 gap-5 mb-6">
+      <div class="card">
+        <label class="label mb-2 block">Ethnic / Culture Profile</label>
+        <select id="ethnic" class="select">
+          <option value="asian:east_asia">Asian / East Asia</option>
+          <option value="asian:southeast_asia">Asian / Southeast Asia</option>
+          <option value="asian:south_asia">Asian / South Asia</option>
+          <option value="asian:west_asia">Asian / West Asia</option>
+          <option value="european:northern_europe">European / Northern Europe</option>
+          <option value="european:western_europe" selected>European / Western Europe</option>
+          <option value="european:southern_europe">European / Southern Europe</option>
+          <option value="european:eastern_europe">European / Eastern Europe</option>
+          <option value="african:north_africa">African / North Africa</option>
+          <option value="african:west_africa">African / West Africa</option>
+          <option value="african:east_africa">African / East Africa</option>
+          <option value="african:southern_africa">African / Southern Africa</option>
+          <option value="latin_american:central_america">Latin American / Central America</option>
+          <option value="latin_american:caribbean">Latin American / Caribbean</option>
+          <option value="latin_american:andean">Latin American / Andean</option>
+          <option value="latin_american:southern_cone">Latin American / Southern Cone</option>
+        </select>
+      </div>
+      <div class="card">
+        <label class="label mb-2 block">Age Cohort</label>
+        <select id="ageCohort" class="select">
+          <option value="18-29">18–29</option>
+          <option value="30-39">30–39</option>
+          <option value="40-54" selected>40–54</option>
+        </select>
+      </div>
+      <div class="card">
+        <label class="label mb-2 block">Gender</label>
+        <div class="flex gap-6">
+          <label class="inline-flex items-center"><input type="radio" name="gender" value="female" class="radio" /> <span class="ml-2">Woman</span></label>
+          <label class="inline-flex items-center"><input type="radio" name="gender" value="male" class="radio" checked /> <span class="ml-2">Man</span></label>
+        </div>
+      </div>
+    </section>
+
+    <section class="card mb-6">
+      <label class="label mb-2 block">Upload Images (3–10)</label>
+      <div class="file-input-wrap">
+        <input id="imageInput" type="file" accept="image/*,.heic,.heif" multiple class="file-input-hidden"/>
+        <button id="chooseFilesBtn" type="button" class="file-input-label">Choose Files</button>
+        <button id="clearFilesBtn" class="btn" type="button">Clear</button>
+      </div>
+      <div id="fileList" class="mt-2 text-sm" style="color:var(--muted)">No files chosen.</div>
+      <div id="previews" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mt-3" aria-live="polite"></div>
+    </section>
+
+    <div class="flex gap-4 mb-8">
+      <button id="scoreBtn" class="btn flex-1" disabled>Run Assessment</button>
+      <div class="hidden sm:block"><button id="themeBtn" class="btn" type="button">Auto Theme</button></div>
+    </div>
+
+    <div id="err" class="error-message hidden"></div>
+    <div id="info" class="info-message hidden"></div>
+
+    <section id="results" class="hidden">
+      <h2 class="text-2xl mb-3">Your Facial Beauty Report</h2>
+      <div id="lowConf" class="error-message hidden"></div>
+
+      <div class="grid md:grid-cols-2 gap-5">
+        <div class="card">
+          <h3 class="text-xl mb-3">Universal Criteria</h3>
+          <div id="universalList" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+          <p class="mt-3 font-bold">Universal Score: <span id="universalSum" class="kpi">—</span> / 100</p>
+        </div>
+
+        <div class="card">
+          <h3 class="text-xl mb-3">Adjusted Scores</h3>
+          <ul id="adjustedScores" class="space-y-1">
+            <li><span class="font-bold">Own Self:</span> <span class="kpi" id="scoreOwn">—</span> / 100</li>
+            <li><span class="font-bold">Social/Career:</span> <span class="kpi" id="scoreSocial">—</span> / 100</li>
+            <li><span class="font-bold">Dating/Media:</span> <span class="kpi" id="scoreDating">—</span> / 100</li>
+            <li><span class="font-bold">Ethnic-Adjusted:</span> <span class="kpi" id="scoreEthnic">—</span> / 100</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-xl">Category Radars</h3>
+        </div>
+        <div id="catCharts" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+      </div>
+
+      <div class="card mt-6">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl">Where you land</h3>
+          <div class="text-xs flex items-center gap-3">
+            <span><span class="legend-dot" style="background:var(--orange-700)"></span>Universal</span>
+            <span><span class="legend-dot" style="background:var(--green-500)"></span>Own</span>
+            <span><span class="legend-dot" style="background:var(--violet-600)"></span>Social</span>
+            <span><span class="legend-dot" style="background:#999"></span>Dating</span>
+            <span><span class="legend-dot" style="background:#666"></span>Ethnic</span>
+          </div>
+        </div>
+        <div class="mt-3" style="aspect-ratio: 2.2 / 1;">
+          <canvas id="bellChart"></canvas>
+        </div>
+      </div>
+
+      <div id="strengthsLimiters" class="grid md:grid-cols-2 gap-5 mt-6"></div>
+
+      <div class="card mt-6">
+        <h3 class="text-xl mb-2">Your Beauty Report</h3>
+        <div id="explainer" class="max-w-none" style="color:var(--ink);"></div>
+      </div>
+
+      <div class="card mt-6">
+        <h3 class="text-xl mb-2">Improvement Tips</h3>
+        <ul id="tips" class="list-disc list-inside space-y-1"></ul>
+      </div>
+    </section>
+  </div>
+
+  <div id="loading" class="loading-overlay">
+    <div class="spinner"></div>
+    <span>Analyzing images... Please wait.</span>
+  </div>
+
+  <script>
+    // Theme
+    const lightBtn=document.getElementById('lightBtn'), darkBtn=document.getElementById('darkBtn'), themeBtn=document.getElementById('themeBtn');
+    function applyTheme(t){ document.documentElement.setAttribute('data-theme',t);
+      lightBtn.classList.toggle('active',t==='light'); darkBtn.classList.toggle('active',t==='dark'); localStorage.setItem('beauty.theme',t);
+      if(window.__lastResult){const{data,rubric,gender}=window.__lastResult; categoryCharts(data,rubric,gender); renderBellCurve(data);}}
+    lightBtn.addEventListener('click',()=>applyTheme('light')); darkBtn.addEventListener('click',()=>applyTheme('dark'));
+    themeBtn&&themeBtn.addEventListener('click',()=>applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+    applyTheme(localStorage.getItem('beauty.theme')||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+
+    // DOM refs
+    const ageCohortSel=document.getElementById('ageCohort'), ethnicSel=document.getElementById('ethnic');
+    const imageInput=document.getElementById('imageInput'), clearFilesBtn=document.getElementById('clearFilesBtn');
+    const fileListDiv=document.getElementById('fileList'), previews=document.getElementById('previews');
+    const scoreBtn=document.getElementById('scoreBtn'), loading=document.getElementById('loading'), err=document.getElementById('err'), info=document.getElementById('info');
+    const results=document.getElementById('results'), lowConf=document.getElementById('lowConf'), universalList=document.getElementById('universalList');
+    const universalSumEl=document.getElementById('universalSum'), tipsEl=document.getElementById('tips'), explainerDiv=document.getElementById('explainer'), strengthsLimiters=document.getElementById('strengthsLimiters');
+    const catChartsDiv=document.getElementById('catCharts'), scoreOwn=document.getElementById('scoreOwn'), scoreSocial=document.getElementById('scoreSocial'), scoreDating=document.getElementById('scoreDating'), scoreEthnic=document.getElementById('scoreEthnic');
+    const radarColors=['--cyan-600','--orange-700','--yellow-300','--green-500','--violet-600'];
+    let files=[], MIN_FILES=3, MAX_FILES=10;
+
+    // Persist lightweight selections
+    const LS={ theme:'beauty.theme', age:'beauty.age', ethnic:'beauty.ethnic', gender:'beauty.gender' };
+    function loadPersisted(){
+      const g=localStorage.getItem(LS.gender)||'male'; document.querySelectorAll('input[name="gender"]').forEach(i=>i.checked=(i.value===g));
+      const a=localStorage.getItem(LS.age); if(a) ageCohortSel.value=a;
+      const e=localStorage.getItem(LS.ethnic); if(e) ethnicSel.value=e;
+      maybeEnable();
+    }
+    function savePersisted(){
+      const g=document.querySelector('input[name="gender"]:checked').value; localStorage.setItem(LS.gender,g);
+      localStorage.setItem(LS.age, ageCohortSel.value);
+      localStorage.setItem(LS.ethnic, ethnicSel.value);
+    }
+    document.querySelectorAll('input[name="gender"]').forEach(i=>i.addEventListener('change',savePersisted));
+    ageCohortSel.addEventListener('change',savePersisted);
+    ethnicSel.addEventListener('change',savePersisted);
+
+    // Helpers
+    const readyHint=document.createElement('div'); readyHint.className='text-sm'; readyHint.style.color='var(--muted)'; readyHint.style.margin='-0.5rem 0 0.75rem'; readyHint.id='readyHint';
+    document.querySelector('.flex.gap-4.mb-8').insertAdjacentElement('beforebegin', readyHint);
+    function updateReadyHint(){ const needsFiles=!(files.length>=MIN_FILES && files.length<=MAX_FILES); readyHint.innerHTML = needsFiles?`Need <strong>3–10 images</strong> to run.`:'Ready to run.'; }
+    function show(el,msg,cls='info'){el.textContent=msg; el.classList.remove('hidden'); el.className=cls==='error'?'error-message':'info-message';}
+    function hide(el){el.classList.add('hidden');}
+    function maybeEnable(){ const ok=(files.length>=MIN_FILES && files.length<=MAX_FILES); scoreBtn.disabled = !ok; updateReadyHint(); }
+
+    // Files
+    document.getElementById('chooseFilesBtn').addEventListener('click',()=>imageInput.click());
+    clearFilesBtn.addEventListener('click',()=>{ imageInput.value=''; files=[]; fileListDiv.textContent='No files chosen.'; previews.innerHTML=''; maybeEnable(); });
+    imageInput.addEventListener('change',handleFiles);
+    function handleFiles(){ hide(err); hide(info); results.classList.add('hidden'); files=Array.from(imageInput.files||[]).slice(0,MAX_FILES); console.log('Files selected:', files.length); renderFileList(); }
+    function renderFileList(){ if(!files.length){fileListDiv.textContent='No files chosen.'; previews.innerHTML=''; maybeEnable(); return;} if(files.length>MAX_FILES) files=files.slice(0,MAX_FILES);
+      fileListDiv.textContent=`${files.length} file(s) chosen.`; previews.innerHTML='';
+      files.forEach(file=>{ const item=document.createElement('div'); item.className='rounded border border-dotted flex items-center justify-center'; item.style.borderColor='var(--outline-dim)'; item.style.height='9rem';
+        const can=/^image\//i.test(file.type)||/\.(jpg|jpeg|png|webp|gif)$/i.test(file.name);
+        if(can){ const img=document.createElement('img'); img.alt=file.name; img.className='w-full h-36 object-contain rounded'; img.src=URL.createObjectURL(file);
+          let fail=false; img.onerror=()=>{fail=true; item.innerHTML=`<span class="file-pill">${file.name}</span>`;}; img.onload=()=>{ if(!fail) setTimeout(()=>URL.revokeObjectURL(img.src),0); }; item.appendChild(img); }
+        else item.innerHTML=`<span class="file-pill">${file.name}</span>`;
+        previews.appendChild(item);
+      });
+      maybeEnable();
+    }
+
+    async function fileToBase64(file){
+      return new Promise((resolve,reject)=>{ const reader=new FileReader(); reader.onload=()=>{ try{ resolve(String(reader.result).split(',')[1]||''); }catch(e){ reject(e);} }; reader.onerror=reject; reader.readAsDataURL(file); });
+    }
+
+    function safeParseJSON(raw){
+      if(!raw) return null;
+      try{ return JSON.parse(raw); }catch(e){ console.warn("Initial JSON parse failed:", e); }
+      // Attempt to clean and re-parse if initial parse fails (e.g., due to markdown fences)
+      const cleaned=raw.replace(/^[`~]{3}[\\s\\S]*?\\n?|[`~]{3}$/g,'').trim();
+      try{ return JSON.parse(cleaned); }catch(e){ console.warn("Cleaned JSON parse failed:", e); }
+      // Attempt to extract JSON object from a larger string
+      const s=cleaned.indexOf('{'); const e=cleaned.lastIndexOf('}');
+      if(s!==-1 && e!==-1 && e>s){ try{ return JSON.parse(cleaned.slice(s,e+1)); }catch(e){ console.warn("Sliced JSON parse failed:", e); } }
+      return null;
+    }
+
+    function hexToRGBA(hex,a){ const h=hex.replace('#',''); const b=parseInt(h,16); const r=(b>>16)&255, g=(b>>8)&255, bl=b&255; return `rgba(${r},${g},${bl},${a})`; }
+
+    function drawRadar(canvas,labels,values,colorVar,maxScore=5){ const ctx=canvas.getContext('2d'); const W=canvas.width,H=canvas.height;
+      const CX=W/2, CY=H/2, R=Math.min(W,H)/2.4, N=labels.length, step=Math.PI*2/N; ctx.clearRect(0,0,W,H);
+      const grid=getComputedStyle(document.body).getPropertyValue('--gridline').trim(); const labelColor=getComputedStyle(document.body).getPropertyValue('--label').trim();
+      const stroke=getComputedStyle(document.body).getPropertyValue(colorVar).trim(); const fill=hexToRGBA(stroke,.12);
+      ctx.strokeStyle=grid; ctx.lineWidth=1.2; for(let i=1;i<=maxScore;i++){ ctx.beginPath(); ctx.arc(CX,CY,(R/maxScore)*i,0,Math.PI*2); ctx.stroke(); }
+      ctx.beginPath(); for(let i=0;i<N;i++){ const a=i*step-Math.PI/2; ctx.moveTo(CX,CY); ctx.lineTo(CX+R*Math.cos(a), CY+R*Math.sin(a)); } ctx.stroke();
+      ctx.beginPath(); ctx.fillStyle=fill; ctx.strokeStyle=stroke; ctx.lineWidth=2;
+      for(let i=0;i<N;i++){ const a=i*step-Math.PI/2; const rr=(values[i]/maxScore)*R; const x=CX+rr*Math.cos(a), y=CY+rr*Math.sin(a); if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+      ctx.fillStyle=stroke; for(let i=0;i<N;i++){ const a=i*step-Math.PI/2; const rr=(values[i]/maxScore)*R; const x=CX+rr*Math.cos(a), y=CY+rr*Math.sin(a); ctx.beginPath(); ctx.arc(x,y,3,0,Math.PI*2); ctx.fill(); }
+      ctx.fillStyle=labelColor; ctx.font='12px DM Sans'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      for(let i=0;i<N;i++){ const a=i*step*Math.PI*2/N-Math.PI/2; const x=CX+(R+16)*Math.cos(a), y=CY+(R+16)*Math.sin(a); ctx.fillText(labels[i], x, y); }
+    }
+
+    function calcGroupMeansFromData(data,rubric){ const groups=rubric.groups||{}; const byId=new Map((data.universal_scores||[]).map(s=>[s.id,s.score]));
+      return Object.entries(groups).map(([key,obj])=>{ const ids=obj.criteria_ids||[]; const vals=ids.map(id=>Number(byId.get(id)||0)); const avg=vals.reduce((a,b)=>a+b,0)/(ids.length||1); return { key, name:key.replace(/[_]/g,' ').replace(/\\b\\w/g,m=>m.toUpperCase()), average:Number((avg||0).toFixed(2)), ids }; });
+    }
+
+    function categoryCharts(data,rubric,gender){ const groups=calcGroupMeansFromData(data,rubric); catChartsDiv.innerHTML='';
+      groups.forEach((g,i)=>{ const card=document.createElement('div'); card.className='card'; const canvas=document.createElement('canvas'); canvas.width=360; canvas.height=360; canvas.setAttribute('aria-label',g.name);
+        card.appendChild(canvas); catChartsDiv.appendChild(card);
+        const labels=(g.ids||[]).map(id=>(rubric.criteria.find(c=>c.id===id)||{name:`ID ${id}`}).name);
+        const values=(g.ids||[]).map(id=>{ const s=(data.universal_scores||[]).find(x=>x.id===id); return s ? Number(s.score||0) : 0; });
+        drawRadar(canvas, labels, values, radarColors[i%radarColors.length], 5);
+      });
+      const summary=document.createElement('div'); summary.className='card'; const sCanvas=document.createElement('canvas'); sCanvas.width=360; sCanvas.height=360; sCanvas.setAttribute('aria-label','Summary of groups'); summary.appendChild(sCanvas); catChartsDiv.appendChild(summary);
+      drawRadar(sCanvas, groups.map(g=>g.name), groups.map(g=>g.average), radarColors[groups.length%radarColors.length], 5);
+    }
+
+    let bellChart=null;
+    function renderBellCurve(data){ const score = (typeof data.universal_sum==='number')?data.universal_sum:NaN;
+      const ctx=document.getElementById('bellChart').getContext('2d');
+      const styles=getComputedStyle(document.body);
+      const axisColor=styles.getPropertyValue('--label').trim(); const gridColor=styles.getPropertyValue('--gridline').trim();
+      const teal=styles.getPropertyValue('--cyan-600').trim(); const orange=styles.getPropertyValue('--orange-700').trim();
+      const mean=50, sd=15, xs=[], ys=[], minX=0, maxX=100, step=1; let maxY=0;
+      for(let x=minX;x<=maxX;x+=step){ const y=(1/(sd*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*Math.pow((x-mean)/sd,2)); xs.push(x); ys.push(y); if(y>maxY) maxY=y; }
+      function lineFor(score,color){ if(typeof score!=='number'||isNaN(score)) return null; const y=(1/(sd*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*Math.pow((score-mean)/sd,2)); return { label:String(score), data:[{x:score,y:0},{x:score,y}], parsing:false, borderColor: color, backgroundColor: color, pointRadius:0, borderWidth:2, showLine:true }; }
+      const datasets=[ { label:'distribution', data: ys, borderColor: teal, backgroundColor:'transparent', pointRadius:0, tension:.25 } ];
+      [ lineFor(score,orange) ].filter(Boolean).forEach(d=>datasets.push(d));
+      if (bellChart) bellChart.destroy();
+      bellChart = new Chart(ctx, { type:'line', data:{ labels: xs, datasets }, options:{
+        responsive:true, maintainAspectRatio:false,
+        scales:{ x:{ title:{display:true,text:'Score (0–100)',color:axisColor}, ticks:{color:axisColor}, grid:{color:gridColor}, min:minX, max:maxX }, y:{ display:false, min:0, max:maxY*1.1, grid:{color:gridColor} } },
+        plugins:{ legend:{ display:false } }
+      }});
+    }
+
+    function computeFallbacks(data,rubric){ if (typeof data.universal_sum!=='number' && typeof data.universal_score==='number') data.universal_sum=data.universal_score;
+      if (typeof data.universal_sum!=='number' && Array.isArray(data.universal_scores)) { const vals=data.universal_scores.map(s=>Number(s.score)||0); const mean=vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0; data.universal_sum=Math.max(0,Math.min(100,Math.round((mean/5)*100))); }
+      return data;
+    }
+
+    function renderUniversal(data,rubric){ const byId=new Map(rubric.criteria.map(c=>[c.id,c.name])); universalList.innerHTML='';
+      (data.universal_scores||[]).forEach(s=>{ const name=byId.get(s.id) || `Criterion ${s.id}`; const el=document.createElement('div'); el.className='card'; el.innerHTML=`<div class="font-bold">${name} — <span class="kpi">${s.score}</span>/5</div><div class="text-sm mt-1" style="color:var(--muted)">${s.notes||''}</div>`; universalList.appendChild(el); });
+      universalSumEl.textContent = (typeof data.universal_sum==='number' ? data.universal_sum.toFixed(0) : '—');
+      scoreOwn.textContent = typeof data.adjusted_scores?.own_self==='number' ? data.adjusted_scores.own_self.toFixed(0) : '—';
+      scoreSocial.textContent = typeof data.adjusted_scores?.social_career==='number' ? data.adjusted_scores.social_career.toFixed(0) : '—';
+      scoreDating.textContent = typeof data.adjusted_scores?.dating==='number' ? data.adjusted_scores.dating.toFixed(0) : '—';
+      scoreEthnic.textContent = typeof data.ethnic_adjusted_score==='number' ? data.ethnic_adjusted_score.toFixed(0) : '—';
+    }
+
+    function renderStrengthsLimiters(data){ strengthsLimiters.innerHTML='';
+      const make=(title,items)=>{ const d=document.createElement('div'); d.className='card'; const ul=(items||[]).map(i=>`<li><strong>${i.name||('ID '+i.id)}</strong> — ${i.why||''}</li>`).join(''); d.innerHTML=`<h4 class="text-lg mb-2">${title}</h4><ul class="list-disc list-inside space-y-1">${ul}</ul>`; return d; };
+      if (Array.isArray(data.strengths)) strengthsLimiters.appendChild(make('Standout Strengths', data.strengths));
+      if (Array.isArray(data.limiters)) strengthsLimiters.appendChild(make('Most Impactful Limiters', data.limiters));
+      tipsEl.innerHTML = (data.improvement_tips||[]).map(t=>`<li>${t}</li>`).join('');
+    }
+
+    function escapeHtml(s){ return s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+    function sanitizeExplainer(t){ if(!t) return t;
+      const fillers=[/\\bI'm gonna say\\b/gi,/\\bThat’s the kicker\\b/gi,/\\bThat's the kicker\\b/gi,/\\bHere’s the thing\\b/gi,/\\bHere's the thing\\b/gi,/\\bLet’s break this down\\b/gi,/\\bDid you see\\b/gi];
+      fillers.forEach(rx=> t = t.replace(rx,''));
+      const paras = String(t).trim().split(/\\n{2,}/).map(p=>p.trim());
+      const clipped = paras.map(p=>{ const words=p.split(/\\s+/); if(words.length<=120) return p; return words.slice(0,110).join(' ') + '…'; });
+      return clipped.join('\\n\\n');
+    }
+    function renderExplainer(text){ if (!text){ explainerDiv.textContent = 'Text report unavailable.'; return; }
+      const cleaned=sanitizeExplainer(text);
+      const paras = String(cleaned).trim().split(/\\n{2,}/);
+      explainerDiv.innerHTML = paras.map(p=>`<p>${escapeHtml(p)}</p>`).join('');
+    }
+
+    function getRubricV5(gender){ const id = gender==='female' ? 'rubric_female_v5' : 'rubric_male_v5'; const el=document.getElementById(id);
+      if(!el){ console.error('Rubric element missing:', id); return null; }
+      try{ return JSON.parse(el.textContent); }catch(e){ console.error('Rubric JSON parse failed:', e); return null; }
+    }
+
+    // OpenAI via Netlify Function proxy
+    const OPENAI_PROXY_CHAT = '/.netlify/functions/openai-proxy?path=chat/completions';
+    // The Responses API is not used as per the user's focus on chat completions
+    // const OPENAI_PROXY_RESP = '/.netlify/functions/openai-proxy?path=responses';
+
+    async function generateExplainerOpenAI(rubric, resultData, ethnicValue, ageCohort, gender){
+      const [ethnicGroup, ethnicSub]=String(ethnicValue||'').split(':');
+      const tone=rubric?.report_guidelines?.tone||'friendly, empathetic, conversational'; const style=rubric?.report_guidelines?.style||{}; const voiceHints=JSON.stringify({ tone, style });
+      const groups=rubric?.groups||{};
+      const prompt=`Write plain-text only. No markdown, no asterisks, no emojis, no names. Use the rubric's tone/style implicitly but do not mention any person.
+Return 10 paragraphs separated by a blank line:
+1–5) One paragraph per scoring category (use the rubric's groups; if fewer than 5, add extra "Global Harmony & Presence").
+6) How the age cohort (${ageCohort}) influences perception and scoring.
+7) How the user's ethnic/culture (${ethnicGroup} / ${ethnicSub}) shapes aesthetic preferences (respectful, non-stereotyped).
+8) Self-esteem and improvement: confidence framing with 2–3 practical, low-cost upgrades.
+9) Advantages in social/career settings.
+10) Online dating / social media perception based on the images.
+
+Style constraints:
+• Crisp, professional conversational tone. No filler phrases like "I'm gonna say", "here's the thing", "that's the kicker".
+• Each paragraph 70–95 words (max 100). 
+• Do not repeat the same critique across paragraphs; vary concrete tips.
+• Base all claims on the JSON below—do not invent details. Return only the paragraphs.
+
+RESULT: ${JSON.stringify(resultData)}
+RUBRIC_VOICE_HINTS: ${voiceHints}
+RUBRIC_GROUPS: ${JSON.stringify(groups)}`;
+
+      const content=[{ type:'text', text: prompt }];
+      // Use gpt-5 for explainer generation as well
+      const payload={ model:'gpt-5', messages:[{ role:'user', content }], temperature:0.2, max_tokens:4000, response_format:{ type:'json_object' } }; // Added response_format here for consistency
+      const res=await fetch(OPENAI_PROXY_CHAT,{ method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+      const j=await res.json().catch(()=>({}));
+      const text=j?.choices?.[0]?.message?.content?.trim()||'';
+      return text;
+    }
+
+    async function score(){
+      hide(err);
+      hide(info);
+      results.classList.add('hidden');
+      explainerDiv.textContent='';
+      loading.style.display='flex'; // Show loading spinner immediately
+
+      try {
+        const gender=document.querySelector('input[name="gender"]:checked').value;
+        const [ethnicGroup,ethnicSub]=(ethnicSel.value||'').split(':');
+        const ageCohort=ageCohortSel.value;
+
+        if (files.length < MIN_FILES || files.length > MAX_FILES){
+          show(err,`Please upload between ${MIN_FILES} and ${MAX_FILES} images (you have ${files.length}).`,'error');
+          return; // Exit if file count is invalid
+        }
+
+        let rubric=getRubricV5(gender);
+        if(!rubric){
+          show(err,'Embedded rubric missing or malformed.','error');
+          return; // Exit if rubric is invalid
+        }
+        savePersisted();
+
+        const prompt=`You are scoring facial aesthetics strictly by the rubric JSON (v5). Accept 3–10 images.
+Return ONLY valid JSON with fields:
+- "universal_scores": array of 20 objects { id:1..20, score:number (1..5 with 0.5 steps), notes:string }.
+- "group_means": array of { key, name, average } computed from rubric.groups.
+- "universal_score": number 0–100 computed by weighted group means using rubric.base_weights, then scaled (5 -> 100).
+- "adjusted_scores": { own_self:number, social_career:number, dating:number } applying rubric.use_case_modifiers AND rubric.age_cohort_modifiers for ${ageCohort}, scaled to 0–100.
+- "ethnic_adjusted_score": number 0–100 using rubric.ethnic_modifiers for group "${ethnicGroup}", sub "${ethnicSub}".
+- "strengths": top 3 criteria by score, as [{ id, name, why }].
+- "limiters": bottom 3 criteria by score, as [{ id, name, why }].
+- "improvement_tips": 3–8 concise tips (≤140 chars) tied to specific criteria by name.
+- "low_confidence": boolean if capture conditions look poor.
+
+Rules:
+• Use half-point scores where helpful. Some criteria are more important: use rubric.base_weights and groups.
+• Apply age cohort (${ageCohort}) and ethnic (${ethnicGroup}/${ethnicSub}) multipliers per rubric, renormalize to 1.00.
+• Respond with pure JSON, no markdown, no extra text.
+
+Rubric JSON: ${JSON.stringify(rubric)}`;
+
+        const content=[{ type:'text', text: prompt }];
+        for (const f of files) {
+          const b64 = await fileToBase64(f);
+          content.push({ type:'image_url', image_url: { url: `data:${f.type || 'image/jpeg'};base64,${b64}` } });
+        }
+
+        // Use gpt-5 as the primary model as requested.
+        let modelName = 'gpt-5';
+
+        const payload={ model:modelName, messages:[{ role:'user', content }], response_format:{ type:'json_object' }, temperature:0.2, max_tokens:4000 };
+        let res=await fetch(OPENAI_PROXY_CHAT, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload) });
+        let raw=await res.json().catch((e)=>{ console.error("Error parsing initial OpenAI response JSON:", e); return {}; });
+        let text=(raw?.choices?.[0]?.message?.content)||'';
+        let data=safeParseJSON(text);
+
+        // If initial parse fails and it's a model error, try gpt-4o as a fallback.
+        // This is a safety net in case gpt-5 isn't universally available or has issues.
+        if (!data && raw && (raw.error?.message||'').match(/model|unsupported|not found|does not exist/i)) {
+          console.warn(`Model error with ${modelName}. Falling back to gpt-4o.`);
+          modelName='gpt-4o'; // Fallback model
+          const fallbackPayload={ model:modelName, messages:[{ role:'user', content }], response_format:{ type:'json_object' }, temperature:0.2, max_tokens:4000 };
+          res=await fetch(OPENAI_PROXY_CHAT, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(fallbackPayload) });
+          raw=await res.json().catch((e)=>{ console.error("Error parsing fallback OpenAI response JSON:", e); return {}; });
+          text=(raw?.choices?.[0]?.message?.content)||'';
+          data=safeParseJSON(text);
+        }
+
+        if (!data) {
+          console.error("Final raw response from OpenAI proxy:", raw);
+          const serverMsg = raw && raw.error && raw.error.message ? `\nServer: ${raw.error.message}` : '';
+          throw new Error('JSON Parse error: OpenAI did not return clean JSON or an expected response format.' + serverMsg);
+        }
+
+        data=computeFallbacks(data,rubric);
+        window.__lastResult={ data, rubric, gender }; // Store for theme changes
+        results.classList.remove('hidden');
+
+        if (data.low_confidence) show(lowConf,'Low confidence: capture conditions may have reduced accuracy.','error'); else hide(lowConf);
+        renderUniversal(data,rubric);
+        categoryCharts(data,rubric,gender);
+        renderBellCurve(data);
+        renderStrengthsLimiters(data);
+
+        try {
+          const textReport=await generateExplainerOpenAI(rubric,data,ethnicSel.value,ageCohort,gender);
+          renderExplainer(textReport);
+        } catch(e2) {
+          console.warn('Explainer generation failed', e2);
+          explainerDiv.textContent = 'Text report could not be generated.';
+        }
+      } catch(e) {
+        console.error("Error during scoring process:", e);
+        show(err,`Error scoring images: ${e.message}`,'error');
+      } finally {
+        loading.style.display='none'; // Hide loading spinner
+      }
+    }
+
+    document.getElementById('scoreBtn').addEventListener('click', score);
+    maybeEnable(); loadPersisted();
+  </script>
+</body>
+</html>

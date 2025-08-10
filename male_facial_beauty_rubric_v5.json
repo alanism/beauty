@@ -1,0 +1,382 @@
+{
+  "rubric_type": "male_facial_beauty_v5",
+  "version": "2025-08-09",
+  "scale": {
+    "min": 1,
+    "max": 5,
+    "step": 0.5,
+    "anchors": {
+      "1": "Noticeably discordant or far from attractive range",
+      "3": "Typical / acceptable for age and ancestry",
+      "5": "Elite / striking; highly attractive expression of the trait"
+    }
+  },
+  "image_requirements": [
+    "3–10 images: front, 45°, profile; video (60–90s) optional",
+    "Neutral daylight or diffused white light; no filters",
+    "Camera ≥1.5m away; avoid wide-angle distortion",
+    "Neutral expression + natural smile in at least one image",
+    "Hair not covering face; no glasses if possible"
+  ],
+  "criteria": [
+    {
+      "id": 1,
+      "name": "Symmetry (Male)",
+      "notes": {
+        "18-29": "High symmetry, youthful balance expected.",
+        "30-39": "Balanced symmetry, slight asymmetry acceptable.",
+        "40-54": "Distinguished symmetry, natural variation celebrated."
+      }
+    },
+    {
+      "id": 2,
+      "name": "Averageness (Male)",
+      "notes": {
+        "18-29": "Youthful harmony, typical features emphasized.",
+        "30-39": "Mature harmony, slight deviations acceptable.",
+        "40-54": "Distinguished balance, natural variation prioritized."
+      }
+    },
+    {
+      "id": 3,
+      "name": "Facial Thirds & Index (Male)",
+      "notes": {
+        "18-29": "Proportional thirds, youthful index.",
+        "30-39": "Balanced thirds, slight elongation allowed.",
+        "40-54": "Harmonious thirds, natural proportions elegant."
+      }
+    },
+    {
+      "id": 4,
+      "name": "fWHR & Brow–Orbital Masculinity",
+      "notes": {
+        "18-29": "High fWHR, strong brow-orbital definition.",
+        "30-39": "Defined fWHR, moderate softening acceptable.",
+        "40-54": "Distinguished fWHR, natural softening prioritized."
+      }
+    },
+    {
+      "id": 5,
+      "name": "Jawline Definition (Male)",
+      "notes": {
+        "18-29": "Sharp, chiseled jawline, youthful definition.",
+        "30-39": "Defined jawline, slight softening acceptable.",
+        "40-54": "Strong yet distinguished jawline, natural variation allowed."
+      }
+    },
+    {
+      "id": 6,
+      "name": "Ramus Height & Gonial Angle",
+      "notes": {
+        "18-29": "Tall ramus, defined gonial angle.",
+        "30-39": "Balanced ramus, slight angle softening acceptable.",
+        "40-54": "Distinguished ramus and angle, natural maturity emphasized."
+      }
+    },
+    {
+      "id": 7,
+      "name": "Chin Projection & Shape (Male)",
+      "notes": {
+        "18-29": "Strong, projected chin, youthful shape.",
+        "30-39": "Defined chin, moderate rounding allowed.",
+        "40-54": "Harmonious chin, natural shape celebrated."
+      }
+    },
+    {
+      "id": 8,
+      "name": "Jaw Width Ratio (Male)",
+      "notes": {
+        "18-29": "Wide, masculine jaw ratio.",
+        "30-39": "Balanced jaw ratio, slight narrowing acceptable.",
+        "40-54": "Distinguished jaw ratio, natural variation elegant."
+      }
+    },
+    {
+      "id": 9,
+      "name": "Zygomatic Prominence (Male)",
+      "notes": {
+        "18-29": "Prominent cheekbones, youthful definition.",
+        "30-39": "Defined cheekbones, slight flattening acceptable.",
+        "40-54": "Distinguished cheekbones, natural contour prioritized."
+      }
+    },
+    {
+      "id": 10,
+      "name": "Nose Proportion & Shape (Male)",
+      "notes": {
+        "18-29": "Proportional, masculine nose shape.",
+        "30-39": "Balanced nose, slight broadening allowed.",
+        "40-54": "Harmonious nose, natural variation accepted."
+      }
+    },
+    {
+      "id": 11,
+      "name": "Eyes (Shape/Spacing/Tilt) (Male)",
+      "notes": {
+        "18-29": "Defined shape, youthful spacing and tilt.",
+        "30-39": "Balanced eyes, slight hooding acceptable.",
+        "40-54": "Distinguished eye shape, natural aging graceful."
+      }
+    },
+    {
+      "id": 12,
+      "name": "Eyebrows (Male)",
+      "notes": {
+        "18-29": "Full, defined brows, youthful frame.",
+        "30-39": "Groomed brows, moderate thinning acceptable.",
+        "40-54": "Distinguished brows, natural grooming emphasized."
+      }
+    },
+    {
+      "id": 13,
+      "name": "Periorbital Support (Male)",
+      "notes": {
+        "18-29": "Strong periorbital support, youthful clarity.",
+        "30-39": "Balanced support, slight softening acceptable.",
+        "40-54": "Distinguished support, natural aging graceful."
+      }
+    },
+    {
+      "id": 14,
+      "name": "Lips (Form/Ratio) (Male)",
+      "notes": {
+        "18-29": "Defined lips, masculine proportion.",
+        "30-39": "Balanced lips, slight thinning acceptable.",
+        "40-54": "Harmonious lips, natural shape prioritized."
+      }
+    },
+    {
+      "id": 15,
+      "name": "Teeth & Smile (Male)",
+      "notes": {
+        "18-29": "Bright, aligned smile, youthful vitality.",
+        "30-39": "Balanced smile, minor imperfections acceptable.",
+        "40-54": "Warm, distinguished smile, elegance emphasized."
+      }
+    },
+    {
+      "id": 16,
+      "name": "Hairline & Density / Shaved Aesthetic",
+      "notes": {
+        "18-29": "Full hairline, dense or sharp shaved look, no grey penalty.",
+        "30-39": "Balanced hairline, moderate thinning or grey hair acceptable.",
+        "40-54": "Distinguished hairline, grey hair or thinning natural and elegant."
+      }
+    },
+    {
+      "id": 17,
+      "name": "Skin Texture (Male)",
+      "notes": {
+        "18-29": "Smooth, clear skin, minimal blemishes.",
+        "30-39": "Even texture, early lines or wrinkles acceptable.",
+        "40-54": "Distinguished texture, expression lines and wrinkles natural."
+      }
+    },
+    {
+      "id": 18,
+      "name": "Skin Tone Evenness (Male)",
+      "notes": {
+        "18-29": "Even, vibrant skin tone.",
+        "30-39": "Balanced tone, slight unevenness acceptable.",
+        "40-54": "Harmonious tone, natural variation celebrated."
+      }
+    },
+    {
+      "id": 19,
+      "name": "Facial Leanness (Male)",
+      "notes": {
+        "18-29": "Lean, defined face, youthful sharpness.",
+        "30-39": "Balanced leanness, moderate facial weight acceptable.",
+        "40-54": "Distinguished leanness, natural facial weight elegant."
+      }
+    },
+    {
+      "id": 20,
+      "name": "Cervico-mental Angle (Male)",
+      "notes": {
+        "18-29": "Sharp, defined angle, youthful contour.",
+        "30-39": "Defined angle, slight softening acceptable.",
+        "40-54": "Distinguished angle, natural softening prioritized."
+      }
+    }
+  ],
+  "groups": {
+    "structure_block": { "criteria_ids": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+    "eyes_skin_block": { "criteria_ids": [11, 12, 13, 17, 18, 19, 20] },
+    "smile_hair_media_block": { "criteria_ids": [14, 15, 16] }
+  },
+  "base_weights": {
+    "structure_block": 0.50,
+    "eyes_skin_block": 0.30,
+    "smile_hair_media_block": 0.20
+  },
+  "use_case_modifiers": {
+    "own_self": {
+      "notes": "Focus on health, maintenance, and realistic self-improvement for confidence.",
+      "multipliers": {
+        "structure_block": 1.00,
+        "eyes_skin_block": 1.10,
+        "smile_hair_media_block": 0.95
+      }
+    },
+    "social_career": {
+      "notes": "Highlight authority, polish, and approachability for professional settings.",
+      "multipliers": {
+        "structure_block": 1.10,
+        "eyes_skin_block": 1.00,
+        "smile_hair_media_block": 1.00
+      }
+    },
+    "dating": {
+      "notes": "Emphasize masculine structure, eye clarity, and smile impact for romantic appeal.",
+      "multipliers": {
+        "structure_block": 1.10,
+        "eyes_skin_block": 1.05,
+        "smile_hair_media_block": 1.05
+      }
+    }
+  },
+  "age_cohort_modifiers": {
+    "18-29": {
+      "notes": "Youthful vibrancy: prioritize skin clarity, eyes, and defined structure.",
+      "multipliers": {
+        "structure_block": 0.95,
+        "eyes_skin_block": 1.10,
+        "smile_hair_media_block": 1.00
+      }
+    },
+    "30-39": {
+      "notes": "Mature balance: structure and grooming with leniency for early lines and facial weight.",
+      "multipliers": {
+        "structure_block": 1.05,
+        "eyes_skin_block": 1.00,
+        "smile_hair_media_block": 0.95
+      }
+    },
+    "40-54": {
+      "notes": "Distinguished elegance: grooming and structure with leniency for wrinkles, grey hair, and facial weight.",
+      "multipliers": {
+        "structure_block": 1.05,
+        "eyes_skin_block": 1.00,
+        "smile_hair_media_block": 1.00
+      }
+    }
+  },
+  "ethnic_modifiers": {
+    "european": {
+      "northern_europe": {
+        "notes": "Emphasize strong jawline, angular structure.",
+        "multipliers": { "structure_block": 1.10, "eyes_skin_block": 0.95, "smile_hair_media_block": 0.95 }
+      },
+      "western_europe": {
+        "notes": "Balanced features, defined contours.",
+        "multipliers": { "structure_block": 1.05, "eyes_skin_block": 1.00, "smile_hair_media_block": 0.95 }
+      },
+      "southern_europe": {
+        "notes": "Warm tones, expressive eyes and smile.",
+        "multipliers": { "structure_block": 1.00, "eyes_skin_block": 1.00, "smile_hair_media_block": 1.00 }
+      },
+      "eastern_europe": {
+        "notes": "Strong structure, harmonious features.",
+        "multipliers": { "structure_block": 1.05, "eyes_skin_block": 0.95, "smile_hair_media_block": 1.00 }
+      }
+    },
+    "asian": {
+      "east_asia": {
+        "notes": "Smooth skin, balanced proportions.",
+        "multipliers": { "structure_block": 0.95, "eyes_skin_block": 1.10, "smile_hair_media_block": 0.95 }
+      },
+      "southeast_asia": {
+        "notes": "Soft contours, vibrant skin tones.",
+        "multipliers": { "structure_block": 0.95, "eyes_skin_block": 1.05, "smile_hair_media_block": 1.00 }
+      },
+      "south_asia": {
+        "notes": "Defined features, expressive eyes.",
+        "multipliers": { "structure_block": 1.05, "eyes_skin_block": 1.00, "smile_hair_media_block": 0.95 }
+      },
+      "west_asia": {
+        "notes": "Strong brows, striking eyes.",
+        "multipliers": { "structure_block": 1.05, "eyes_skin_block": 1.00, "smile_hair_media_block": 0.95 }
+      }
+    },
+    "african": {
+      "north_africa": {
+        "notes": "Refined structure, smooth skin.",
+        "multipliers": { "structure_block": 1.05, "eyes_skin_block": 1.00, "smile_hair_media_block": 0.95 }
+      },
+      "west_africa": {
+        "notes": "Strong features, full lips.",
+        "multipliers": { "structure_block": 1.05, "eyes_skin_block": 1.00, "smile_hair_media_block": 0.95 }
+      },
+      "east_africa": {
+        "notes": "Sculpted features, even skin tone.",
+        "multipliers": { "structure_block": 1.00, "eyes_skin_block": 1.05, "smile_hair_media_block": 0.95 }
+      },
+      "southern_africa": {
+        "notes": "Balanced proportions, natural glow.",
+        "multipliers": { "structure_block": 1.05, "eyes_skin_block": 0.95, "smile_hair_media_block": 1.00 }
+      }
+    },
+    "latin_american": {
+      "central_america": {
+        "notes": "Vibrant smile, warm tones.",
+        "multipliers": { "structure_block": 1.00, "eyes_skin_block": 1.00, "smile_hair_media_block": 1.05 }
+      },
+      "caribbean": {
+        "notes": "Expressive features, radiant skin.",
+        "multipliers": { "structure_block": 1.00, "eyes_skin_block": 1.05, "smile_hair_media_block": 1.05 }
+      },
+      "andean": {
+        "notes": "Strong structure, balanced features.",
+        "multipliers": { "structure_block": 1.05, "eyes_skin_block": 0.95, "smile_hair_media_block": 1.00 }
+      },
+      "southern_cone": {
+        "notes": "Refined structure, elegant proportions.",
+        "multipliers": { "structure_block": 1.05, "eyes_skin_block": 0.95, "smile_hair_media_block": 1.00 }
+      }
+    }
+  },
+  "scoring_procedure": [
+    "Score each of the 20 criteria on a 1–5 scale, allowing half-point increments (e.g., 3.5, 4.5) for borderline cases.",
+    "Compute group means for structure_block, eyes_skin_block, smile_hair_media_block.",
+    "Apply base_weights to group means for Universal Score.",
+    "Select use_case, age_cohort, and ethnic_modifier. Multiply base_weights by respective multipliers, then renormalize to sum 1.00.",
+    "Calculate Adjusted Score = Σ(group_mean × adjusted_weight).",
+    "Generate Universal Score, Adjusted Score (use_case-specific), and Ethnic-Adjusted Score.",
+    "Provide per-criterion notes with actionable feedback."
+  ],
+  "visualization_guidelines": {
+    "chart": "Bar chart showing scores for each of the 20 criteria, grouped by category.",
+    "radial_graph": "Radar chart displaying group means (structure_block, eyes_skin_block, smile_hair_media_block).",
+    "bell_curve": "Plot Universal and Adjusted Scores on a bell curve, normalized to population averages for age and ethnic group."
+  },
+  "report_guidelines": {
+    "length": "Approximately 440 words",
+    "tone": "Friendly, empathetic, conversational, with a positive framing and actionable insights.",
+    "style": {
+      "personality": "ENFJ-like, warm, articulate, emotionally intelligent, with dry observational humor.",
+      "verbs": ["break down", "peel back", "dig into", "analyze", "address", "evaluate", "frame"],
+      "adjectives": ["strong", "distinguished", "radiant", "harmonious", "confident", "vibrant"],
+      "colloquialisms": ["Here’s the thing", "I’m gonna say", "At the heart of it", "That’s the kicker"],
+      "transitional_phrases": [
+        "Let’s break this down…",
+        "Here’s why that matters…",
+        "So at the end of the day…",
+        "This is where things get interesting…"
+      ],
+      "questions": [
+        "What makes your unique look stand out?",
+        "How can we amplify what’s already strong?",
+        "Did you see how your presence commands attention?"
+      ]
+    },
+    "structure": [
+      "Open with a positive, empathetic hook (e.g., 'You’ve got a strong presence—let’s dig into what makes it shine!').",
+      "Summarize Universal Score and key strengths.",
+      "Detail Adjusted Scores for own_self, social_career, and dating, with context-specific insights.",
+      "Highlight Ethnic-Adjusted Score, emphasizing cultural beauty standards.",
+      "Provide per-criterion feedback with actionable, positive suggestions (e.g., 'Your jawline is strong; a light grooming routine can keep it sharp!').",
+      "Close with an uplifting takeaway and call to action (e.g., 'What do you think? Let’s keep showcasing your unique vibe!')."
+    ]
+  }
+}
